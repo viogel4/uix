@@ -1,0 +1,38 @@
+[data-comp-type=calendar] {
+    font-size: 14px;
+    color: rgb(119, 119, 119);
+}
+
+[data-comp-type=calendar] [data-comp-role=current-year] i,
+[data-comp-type=calendar] [data-comp-role=current-month] i {
+    font-style: normal;
+}
+
+[data-comp-type=calendar] .calendar-body tr>th {
+    color: #333;
+    width: 36px;
+    height: 30px;
+    text-align: center;
+}
+
+[data-comp-type=calendar] .calendar-body tr>td {
+    color: #777;
+    text-align: center;
+    height: 30px;
+    cursor: pointer;
+}
+
+[data-comp-type=calendar] .calendar-body tr>td:hover {
+    background-color: #eee;
+    color: #333;
+}
+
+[data-comp-type=calendar] .calendar-body tr>td.prev-month,
+[data-comp-type=calendar] .calendar-body tr>td.next-month {
+    color: #d2d2d2;
+}
+
+[data-comp-type=calendar] .calendar-body tr>td.current {
+    color: #fff;
+    background-color: #16baaa;
+}

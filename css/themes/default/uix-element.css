@@ -1,0 +1,6 @@
+/* element组件被禁用的样式 */
+[data-comp-id].disabled {
+    background-color: rgba(0, 0, 0, .2);
+    color: #666;
+    text-shadow: 1px 1px 2px #ccc;
+}

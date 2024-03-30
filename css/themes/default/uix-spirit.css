@@ -1,0 +1,4 @@
+[data-comp-type=spirit]>[data-comp-role~=start-icon] {
+    flex-shrink: 0;
+    margin-right: 3px;
+}

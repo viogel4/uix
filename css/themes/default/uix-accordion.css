@@ -1,0 +1,20 @@
+[data-comp-type=accordion]>[data-comp-type=card]>[data-comp-role~=body].collapsed {
+    height: 0;
+}
+
+[data-comp-type=accordion]>[data-comp-type=card]:has(>[data-comp-role~=body].collapsed) {
+    border-bottom: none;
+}
+
+[data-comp-type=accordion].fits>[data-comp-type=card]:has(>[data-comp-role~=body].collapsed) {
+    flex-shrink: 0;
+}
+
+/* accordion设置了showType="fit"属性，表示面板会自动填充剩余所有空间 */
+[data-comp-type=accordion].fits>[data-comp-type=card]:has(>[data-comp-role~=body]:not(.collapsed)) {
+    height: 100%;
+}
+
+[data-comp-type=accordion].fits>[data-comp-type=card]:last-child:has(>[data-comp-role~=body]:not(.collapsed)) {
+    border-bottom: none;
+}

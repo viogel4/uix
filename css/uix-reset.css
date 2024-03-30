@@ -1,0 +1,142 @@
+/* 重置样式表 */
+:root {
+	/* base-width:1px */
+	--uix-base-bw: 1px;
+	/* font-size:10px */
+	--uix-base-fs: calc(var(--uix-base-bw) * 10);
+}
+
+/* 当浏览器默认字号为16px时，62.5%则为10px，html中字号的大小即为1rem，即1rem=10px*/
+html {
+	/* font-size:16px */
+	font-size: calc(var(--uix-base-fs, 10px) * 1.4);
+}
+
+html,
+body {
+	font-family: "Microsoft Yahei", "微软雅黑", "PingFang SC", "Lantinghei SC", "WenQuanYi Micro Hei", "SimHei", "黑体", "SimSun", "宋体", "Arial", "Helvetica Neue", "Helvetica";
+}
+
+a,
+a:active,
+a:hover,
+a:link,
+a:visited,
+body,
+button,
+input,
+select,
+textarea {
+	font-size: 1rem;
+}
+
+:focus {
+	outline: 0;
+}
+
+button,
+input,
+select,
+textarea {
+	outline: 0;
+}
+
+a,
+a:active,
+a:hover,
+a:link,
+a:visited {
+	text-decoration: none;
+	cursor: pointer;
+	outline: 0;
+}
+
+body,
+blockquote,
+code,
+fieldset,
+legend,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+pre,
+td,
+th,
+input,
+textarea,
+ul,
+ol,
+li,
+dl,
+dt,
+dd {
+	margin: 0;
+	padding: 0;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+fieldset,
+img {
+	border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
+	font-style: normal;
+	font-weight: normal;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+caption,
+th {
+	text-align: left;
+}
+
+sup {
+	vertical-align: text-top;
+}
+
+sub {
+	vertical-align: text-bottom;
+}
+
+input,
+select,
+textarea {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+legend {
+	color: #000;
+}
+
+b,
+strong {
+	font-weight: bold;
+}
+
+button {
+	border: 1px solid #ccc;
+}

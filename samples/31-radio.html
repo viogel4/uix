@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Radio组件示例</title>
+
+    <link rel="stylesheet" href="../css/uix-reset.css">
+    <link rel="stylesheet" href="../css/uix-basic.css">
+    <link rel="stylesheet" href="../css/uix-utility.css">
+    <link rel="stylesheet" href="../css/uix-extra.css">
+    <link rel="stylesheet" href="../css/uix-icon.css" />
+    <link rel="stylesheet" href="../css/themes/default/uix-element.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-panel.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-input.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-radio.css">
+
+    <link rel="stylesheet" href="css/custom.css">
+
+    <script src="../jquery-3.7.1.min.js"></script>
+    <script src="../src/plugins/uix-core.js"></script>
+    <script src="../src/plugins/uix-basic.js"></script>
+    <script src="../src/plugins/uix-element.js"></script>
+    <script src="../src/plugins/uix-panel.js"></script>
+    <script src="../src/plugins/uix-inline.js"></script>
+    <script src="../src/plugins/uix-spirit.js"></script>
+    <script src="../src/plugins/uix-button.js"></script>
+    <script src="../src/plugins/uix-input.js"></script>
+    <script src="../src/plugins/uix-radio.js"></script>
+
+
+    <script>
+        $(function () {
+            $("#male").radio({
+                label:true,
+                labelText: "男",
+                group: "sex",
+                checked: true
+            });
+
+
+            $("#female").radio({
+                label:true,
+                labelText: "女",
+                group: "sex",
+                editable: true
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+    <div id="a1">
+        <input id="male" name="sex" type="radio" value="男">
+        <input id="female" name="sex" type="radio" value="女">
+    </div>
+</body>
+
+</html>

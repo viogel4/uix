@@ -1,0 +1,83 @@
+.btn {
+    padding: 5px 10px;
+    outline: none;
+    background-origin: border-box;
+    display: inline-flex;
+    cursor: pointer;
+    position: relative;
+}
+
+.btn-sm {
+    padding: 3px 6px;
+    font-size: 12px;
+}
+
+.btn:hover::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.btn-default {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    color: var(--uix-dark);
+}
+
+.btn-primary {
+    background-color: var(--uix-blue);
+    color: var(--uix-light);
+    border: 1px solid transparent;
+}
+
+.btn-secondary {
+    background-color: var(--uix-grey-600);
+    color: var(--uix-light);
+    border: 1px solid transparent;
+}
+
+.btn-success {
+    background-color: var(--uix-green);
+    color: var(--uix-light);
+    border: 1px solid transparent;
+}
+
+.btn-info {
+    background-color: var(--uix-teal);
+    color: var(--uix-light);
+    border: 1px solid transparent;
+}
+
+.btn-warning {
+    background-color: var(--uix-orange);
+    color: var(--uix-light);
+    border: 1px solid transparent;
+}
+
+.btn-danger {
+    background-color: var(--uix-red);
+    color: var(--uix-light);
+    border: 1px solid transparent;
+}
+
+/* 表单默认美化样式 */
+.light-form input[type=text],
+.light-form input[type=password],
+.light-form select {
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    padding: 7px;
+    width: 240px;
+    color: #333;
+}
+
+button,
+input[type=button] {
+    border: 1px solid #ccc;
+    padding: 5px 15px;
+}

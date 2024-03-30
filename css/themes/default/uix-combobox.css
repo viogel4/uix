@@ -1,0 +1,46 @@
+[data-comp-role=dropdown-panel]>[data-comp-role=body]>[data-comp-role=list-item-group] {
+    padding: 4px 4px;
+    font-size: 12px;
+    background-color: var(--uix-grey-200);
+}
+
+/* 下拉列表项样式 */
+[data-comp-role=dropdown-panel]>[data-comp-role=body]>[data-comp-role=list-item] {
+    padding: 6px 0;
+}
+
+[data-comp-role=dropdown-panel]>[data-comp-role=body]>[data-comp-role=list-item]:hover {
+    background-color: #16b777;
+    color: #fff;
+}
+
+/* 选中列表项 */
+[data-comp-role=dropdown-panel]>[data-comp-role=body]>[data-comp-role=list-item].selected {
+    background-color: #ff5722;
+    color: #fff;
+}
+
+/* todo：以下暂未删除，待处理 */
+.list>[data-comp-role=option] {
+    padding: 10px;
+    padding-left: 20px;
+    justify-content: flex-start;
+}
+
+/* 列表项滑过 */
+.list>[data-comp-role=option]:hover {
+    background-color: #16b777;
+    color: #fff;
+}
+
+/* 选中列表项 */
+.list>[data-comp-role=option].selected {
+    background-color: #ff5722;
+    color: #fff;
+}
+
+/* 分组 */
+.list>[data-comp-role=group] {
+    padding: 3px 10px;
+    background-color: lightgray;
+}
