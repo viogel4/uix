@@ -41,7 +41,7 @@
 		};
 
 		constructor(domSrc, opts = {}) {
-			let options = uix.handleOptions({}, {
+			let options = uix.options({}, {
 				cssClass: Window.initialCssClass,
 				cssStyle: Window.initialCssStyle
 			}, Window.initialOptions, opts);
@@ -70,13 +70,13 @@
 						elem: "<a>",
 						target: "[data-comp-role~=" + key + "]",
 						compType: "button",
-						compRole: "end-icon " + key,
+						compRole: "ei " + key,
 						order,
 						opts: {
 							icon: "iconify-window-" + key,
 							cssClass: "wbtn",
 							handler: function (e) {
-								let win = uix.closestWindow(e.currentTarget);
+								let win = uix.closestWindow(e.currentTarget);//向上找，最近的Window组件
 								let handler = win.getOptions()[key + "Handler"];
 								if (uix.isFunc(handler)) {
 									handler.call(this, win, e);
@@ -89,16 +89,16 @@
 			}
 
 			//追加自定义头部工具栏
-			if (Array.isArray(options.headerTools) && options.headerTools.length > 0) {
+			if (uix.isArray(options.headerTools) && options.headerTools.length > 0) {
 				options.headerTools.forEach(it => headerTools.push(it));
 			}
 
 			//自定义脚部工具栏，窗口组件默认没有脚部工具栏，dialog组件默认有脚部工具栏
-			if (Array.isArray(options.footerTools) && options.footerTools.length > 0) {
+			if (uix.isArray(options.footerTools) && options.footerTools.length > 0) {
 				let footerTools = uix.applyKey(options, "footer.opts.endIcons", []);
-				options.footerTools.forEach(it=>footerTools.push(it));
+				options.footerTools.forEach(it => footerTools.push(it));
 
-				let footer = uix.handleOptions({
+				let footer = uix.options({
 					act: "set",
 					target: "[data-comp-role~=footer]",
 					order: Window.#DEFAULT_ORDER + 10,
@@ -135,10 +135,6 @@
 			});
 		}
 
-		getCompType() {
-			return "window";
-		}
-
 		render() {
 			let me = this;
 			let opts = this.getOptions();
@@ -155,7 +151,7 @@
 
 			super.render();
 
-			//获取此窗口组件穿越之后所在的window，如果未穿越，则返回当前window
+			//获取此窗口组件穿越之后所在的window对象，如果未穿越，则返回当前window对象
 			let win = uix.windowOf(this.getTarget(), true);
 
 			//创建模态遮罩背景，在拖动时显示，或者用于模态窗口。此遮罩，可复用
@@ -177,7 +173,7 @@
 			if (opts.draggable !== false) {
 				let dopts = {
 					handle: "[data-comp-role~=header]",
-					excluded: "[data-comp-role~=end-icon]",
+					excluded: "[data-comp-role~=ei]",
 					delay: 50,
 					onBeforeDrag: e => {
 						if (uix.isFunc(opts.onBeforeDrag)) {
@@ -208,9 +204,9 @@
 				};
 
 				if (uix.isObject(opts.draggable)) {//如果是配置项对象
-					uix.handleOptions(dopts, opts.draggable);
+					uix.options(dopts, opts.draggable);
 				}
-				$(dom).draggable(dopts);
+				$(dom).draggable(dopts);//添加拖放功能
 			}
 
 			//添加调整大小能力，多次执行不会重复添加
@@ -223,16 +219,16 @@
 				}
 
 				if (uix.isObject(opts.resizable)) {//如果是配置项对象
-					uix.handleOptions(ropts, opts.resizable);
+					uix.options(ropts, opts.resizable);
 				}
 
-				$(dom).resizable(ropts);
+				$(dom).resizable(ropts);//添加改变尺寸能力
 			}
 		}
 
-		//设置头部icon
+		//设置头部按钮的icon
 		setHeaderBtnIcon(role, icon) {
-			let btn = this.getHeader().childrenByRole(role);
+			let btn = this.getHeader().childrenByRole(role);//获取头部按钮组件
 			if (uix.isArray(btn) && btn.length > 0) {
 				btn[0].setIcon(icon);
 			}
@@ -645,9 +641,8 @@
 	});
 
 
-	//快捷创建语法
 	$.fn.window = function (options, ...params) {
-		return uix.applyOrNew(this, "window", "card", Window, options, ...params);
+		return uix.make(this, Window, options, ...params);
 	};
 
 	//所有方法

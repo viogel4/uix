@@ -7,7 +7,7 @@
 	};
 
 	//可以自动解析class和style的extend，扩展自jquery的extend，递归对opts下的cssStyle和cssClass属性进行parse操作
-	uix.handleOptions = (target, ...options) => {
+	uix.options = (target, ...options) => {
 		deepParse(target, true);
 
 		options.forEach(it => deepParse(it, true));
@@ -23,7 +23,7 @@
 					continue;
 				}
 
-				if ($.isPlainObject(obj[name]) || Array.isArray(obj[name])) {
+				if (uix.isObject(obj[name]) || uix.isArray(obj[name])) {
 					deepParse(obj[name], name === "opts");
 				}
 			}
@@ -32,15 +32,15 @@
 		return $.extend(true, target, ...options);
 	};
 
-	//创建组件选项对象
+	//创建组件配置项对象
 	uix.compOptions = function (dom, compType, options) {
 		let state = $.data(uix.getRef(dom), "comp-state");//考虑到dom有可能已经不是comp组件，所以此处并未转换成comp组件，再获取配置项
 		let opts;
 
 		if (state) {
-			opts = uix.handleOptions(state.options, options);
+			opts = uix.options(state.options, options);//在旧配置项上合并新的配置
 		} else {
-			opts = uix.handleOptions({}, $.fn[compType].defaults, options);
+			opts = uix.options({}, $.fn[compType].defaults, options);//初始化创建一个全新配置
 		}
 		return opts;
 	};
@@ -144,35 +144,38 @@
 		return uix.closestComp(child, "Window");
 	}
 
-	//调用组件方法或创建组件实例
-	uix.applyOrNew = function ($jq, api, parentApi, constructor, options, ...params) {
-		if (uix.isString(options)) {
-			let method = $.fn[api].methods[options];
+	//调用组件方法或创建组件实例。参数constructor即组件的类型，如Element，同时也是构造函数
+	uix.make = function ($jq, constructor, options, ...params) {
+		let compType = constructor.name.toLowerCase();//组件类型字符串，是组件构造函数的首字母小写格式
+
+		if (uix.isString(options)) {//options是字符串，表示调用组件方法
+			let method = $.fn[compType].methods[options];//组件对外公布的可通过jquery对象调用的方法
 			if (uix.isFunc(method)) {
 				return method($jq, ...params);
-			} else {
+			} else {//如果不是函数，则从组件内部去获取方法
 				method = constructor.prototype[options];
-				if (uix.isFunc(method)) {
+				if (uix.isFunc(method)) {//如果能找到，直接调用组件内部的方法
 					return uix.each($jq, it => method.call(it, ...params));
 				} else {
-					if (parentApi) {
-						return $jq[parentApi](options, ...params);
+					let pc = constructor.prototype.__proto__.constructor;//父类构造函数
+					if (pc !== Object) {
+						return uix.make($jq, pc, options, ...params);
 					} else {
 						throw new Error("目标方法不存在");
 					}
 				}
 			}
+		} else {//表示创建组件实例
+			options = options || {};
+
+			return $jq.each(function () {
+				let opts = uix.compOptions(this, compType, options);
+
+				//每次会重建对象，重建对象时，会继承之前的配置
+				let elem = Reflect.construct(constructor, [this, opts]);
+				elem.render(); //手动执行渲染
+			});
 		}
-
-		options = options || {};
-
-		return $jq.each(function () {
-			let opts = uix.compOptions(this, api, options);
-
-			//每次会重建对象，重建对象时，会继承之前的配置
-			let elem = Reflect.construct(constructor, [this, opts]);
-			elem.render(); //手动执行渲染
-		});
 	};
 
 	//获取某dom元素当前所在的window。第2个参数findPenetrable表示，是否获取元素穿越之后穿越元素所在的window
@@ -206,32 +209,16 @@
 		return $(this).each((_, t) => $(t)[ability](options));
 	};
 
-	//获取dom元素（组件）的角色，返回一个数组，若无角色，则返回空数组
-	uix.getRoles = dom => {
-		let comp = $(dom).asComp();
-		if (comp) {
-			return comp.getRoles();
-		} else {//不是组件的情况下，则无需考虑dom引用
-			let roles = $(dom).data("comp-role");
-			return uix.isString(roles) ? roles.split(/\s+/) : [];
-		}
-	};
-
-	//检查dom，是否拥有指定的角色
-	uix.hasRole = (dom, role) => {
-		return uix.hasAllRoles(dom, [role]);
-	};
-
-	//检查dom，是否拥有其中某一个角色
+	//检查dom组件，是否拥有其中某一个角色
 	uix.hasAnyRole = (dom, roles) => {
-		let rs = uix.getRoles(dom);//组件或dom拥有的角色
-		return roles.some(r => rs.includes(r));
+		let trs = $(dom).asComp().getRoles();
+		return roles.some(r => trs.includes(r));
 	};
 
-	//检查dom，是否拥有指定的全部角色
+	//检查dom组件，是否拥有指定的全部角色
 	uix.hasAllRoles = (dom, roles) => {
-		let rs = uix.getRoles(dom);//组件或dom拥有的角色
-		return uix.isArray(rs) ? roles.every(r => rs.includes(r)) : false;
+		let trs = $(dom).asComp().getRoles();
+		return roles.every(r => trs.includes(r))
 	};
 
 	//查找拥有某个角色的组件，返回组件数组
@@ -368,7 +355,7 @@
 		let $dom = $("<div class='dpn messager'>").html("<div>" + opts.message + "</div>").appendTo(document.body);
 
 		//对话框配置项
-		let dopts = uix.handleOptions({
+		let dopts = uix.options({
 			modal: true,//模态窗口
 			buttons: [{
 				buttonText: opts.okText || "确定",
@@ -432,7 +419,7 @@
 		}
 		opts.content = null;//必须移除，否则会使用此content填充面板内容
 
-		let dopts = uix.handleOptions({
+		let dopts = uix.options({
 			resizable: true,
 			maximizable: true, //是否可最大化
 			buttons: [{

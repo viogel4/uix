@@ -14,7 +14,7 @@
 		};
 
 		constructor(domSrc, opts = {}) {
-			let options = uix.handleOptions({}, {
+			let options = uix.options({}, {
 				cssClass: Inline.initialCssClass,
 				cssStyle: Inline.initialCssStyle
 			}, Inline.initialOptions, opts, {
@@ -26,10 +26,6 @@
 
 			super(domSrc, options);
 		}
-
-		getCompType() {
-			return "inline";
-		}
 		////
 	}
 
@@ -37,7 +33,7 @@
 	uix.Inline = Inline;
 
 	$.fn.inline = function (options, ...params) {
-		return uix.applyOrNew(this, "inline", "panel", Inline, options, ...params);
+		return uix.make(this, Inline, options, ...params);
 	};
 
 	$.fn.inline.methods = {

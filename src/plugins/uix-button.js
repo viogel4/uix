@@ -7,18 +7,19 @@
 		//静态变量
 		static initialCssStyle = {}; //初始行内样式
 		static initialCssClass = ["csr-p", "fcc", "fsk-0"]; //初始类名称
-		static initialOptions = {}; //全局默认配置
+		static initialOptions = {}; //全局初始配置
 
 		//设置按钮文本，支持html
 		#buttonText;//按钮文本，支持html
 
 		constructor(domSrc, opts = {}) {
-			let options = uix.handleOptions({}, {
+			let options = uix.options({}, {
 				cssClass: Button.initialCssClass,
 				cssStyle: Button.initialCssStyle
 			}, Button.initialOptions, opts);
 
 			let ref = uix.getRef(domSrc);
+
 			//此种场景更多一些，即一个a、i、div或button标签，含有文本（或简单html），作为按钮的文字，但要注意html内容不能太复杂
 			if (uix.isNotValid(options.buttonText)) {
 				options.buttonText = $(ref).html().trim();
@@ -27,12 +28,9 @@
 			//清空dom元素内容
 			$(ref).empty();
 			super(domSrc, options);
+
 			//不要调用setText，setText会渲染dom
 			this.#buttonText = super.getOptions().buttonText;
-		}
-
-		getCompType() {
-			return "button";
 		}
 
 		//如有必要，重写父类方法
@@ -61,23 +59,24 @@
 
 		//注意：此方法会设置button唯一的一个icon，如果有多个icon，则不能调用此方法
 		setIcon(icon) {
-			let tpl = {
+			let item = {
 				act: "set",
 				elem: "<i>",
-				target: "[data-comp-role~=btn-icon]",
-				compRole: "start-icon btn-icon"
+				target: "[data-comp-role~=bi]",
+				compRole: "si bi"
 			};
 
 			if (uix.isString(icon)) {
-				icon = uix.handleOptions(tpl, {
+				icon = uix.options(item, {
 					opts: {
 						cssClass: icon
 					}
 				});
 			} else {
-				icon = uix.handleOptions(tpl, icon);
+				icon = uix.options(item, icon);
 			}
 
+			//将icon添加到body前方
 			super.prependIcon(icon);
 			return this;
 		}
@@ -111,6 +110,7 @@
 			return this;
 		}
 
+		//获取按钮文本
 		getText() {
 			return this.#buttonText;
 		}
@@ -121,7 +121,7 @@
 	uix.Button = Button;
 
 	$.fn.button = function (options, ...params) {
-		return uix.applyOrNew(this, "button", "spirit", Button, options, ...params);
+		return uix.make(this, Button, options, ...params);
 	};
 
 	//所有方法
@@ -130,7 +130,7 @@
 	};
 
 	$.fn.button.defaults = $.extend(true, {}, $.fn.spirit.defaults, {
-		//icon: "", //支持字符串，数组，对象。为字符串和数组时，值为类名称，为对象时，值为组件配置项。注意：空对象，会被视为一个默认的element组件
+		//icon: "", //支持字符串，数组，对象。为字符串和数组时，值为类名称；为对象时，值为组件配置项。注意：空对象，会被视为一个默认的element组件
 		//buttonText: "",
 		//onClick: $.noop,
 		//handler: $.noop,//效果等同于onClick

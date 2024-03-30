@@ -9,13 +9,13 @@
 		static initialCssStyle = {}; //初始行内样式
 		static initialCssClass = []; //初始类名称
 
-		//全局初始默认配置
+		//全局初始配置
 		static initialOptions = {
 			direction: "column",//垂直方向
 		};
 
 		//组件模板
-		static #TPL = {
+		static #DEFAULT = {
 			header: {
 				act: "set",
 				elem: "[data-comp-role~=header]",
@@ -26,8 +26,8 @@
 				opts: {
 					startIcons: [{
 						act: "set",
-						target: "[data-comp-role~=card-icon]",
-						compRole: "start-icon card-icon",
+						target: "[data-comp-role~=ci",
+						compRole: "si ci",
 						opts: {
 							cssClass: "iconify-card"
 						}
@@ -55,14 +55,14 @@
 		};
 
 		constructor(domSrc, opts = {}) {
-			let options = uix.handleOptions({}, {
+			let options = uix.options({}, {
 				cssClass: Card.initialCssClass,
 				cssStyle: Card.initialCssStyle
 			}, Card.initialOptions, opts);
 
 			let items = uix.applyKey(options, "items", []);
 
-			let parts = ["header", "body", "footer"];
+			let parts = ["header", "body", "footer"];//头部，主体，脚部
 			parts.forEach(it => {
 				if (options[it] === false) {
 					items.push({
@@ -70,9 +70,9 @@
 						target: "[data-comp-role~=" + it + "]"
 					});
 				} else {
-					let part = Card.#TPL[it];//预配置
+					let part = Card.#DEFAULT[it];//取出默认配置
 					if (uix.isObject(options[it])) {
-						items.push(uix.handleOptions(part, options[it]));
+						items.push(uix.options(part, options[it]));
 					} else {
 						items.push(part);
 					}
@@ -82,11 +82,6 @@
 			super(domSrc, options);
 		}
 
-		getCompType() {
-			return "card";
-		}
-
-		//如有必要，重写父类方法
 		render() {
 			let opts = this.getOptions();
 			let target = this.getTarget();
@@ -129,30 +124,31 @@
 			//卡片头部，icon和title都是设置到header组件上，组件类型spirit。
 			let header = this.getHeader();
 			if (header) {
-				let tpl = {
+				let item = {
 					act: "set",
-					target: "[data-comp-role~=card-icon]",
-					compRole: "start-icon card-icon"
+					target: "[data-comp-role~=ci]",
+					compRole: "si ci"
 				};
 
 				if (uix.isString(icon)) {
-					icon = uix.handleOptions(tpl, {
+					icon = uix.options(item, {
 						opts: {
 							cssClass: icon
 						}
 					});
 				} else {
-					icon = uix.handleOptions(tpl, icon);
+					icon = uix.options(item, icon);
 				}
 
 				header.prependIcon(icon);
 			}
+			return this;
 		}
 
 		setTitle(title) {
 			let header = this.getHeader();
 			if (header) {
-				let body = header.getBody();
+				let body = header.getBody();//返回body组件
 				if (body) {
 					$(body.getTarget()).text(title);
 				}
@@ -184,7 +180,7 @@
 	uix.Card = Card;
 
 	$.fn.card = function (options, ...params) {
-		return uix.applyOrNew(this, "card", "inline", Card, options, ...params);
+		return uix.make(this, Card, options, ...params);
 	};
 
 	//所有方法

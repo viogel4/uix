@@ -8,7 +8,7 @@
 		//静态变量
 		static initialCssStyle = {}; //初始行内样式
 		static initialCssClass = []; //初始类名称
-		static initialOptions = { //全局默认配置
+		static initialOptions = { //全局初始配置
 			layout: {
 				type: "row",
 				items: [{
@@ -66,7 +66,7 @@
 		};
 
 		constructor(domSrc, opts = {}) {
-			let options = uix.handleOptions({}, {
+			let options = uix.options({}, {
 				cssClass: ScrollPane.initialCssClass,
 				cssStyle: ScrollPane.initialCssStyle
 			}, ScrollPane.initialOptions, opts);
@@ -80,19 +80,15 @@
 
 			///todo:初始化，待重构，不要写死成items[0]及items[1]
 			options = this.getOptions();
-			if ($.isFunction(options.startAct)) {
+			if (uix.isFunc(options.startAct)) {
 				uix.applyKey(options, "layout.items[0].opts.onClick", options.startAct);
 			}
 
-			if ($.isFunction(options.endAct)) {
+			if (uix.isFunc(options.endAct)) {
 				uix.applyKey(options, "layout.items[2].opts.onClick", options.endAct);
 			}
 
 			///////////////
-		}
-
-		getCompType() {
-			return "scrollpane";
 		}
 
 		//如有必要，重写父类方法
@@ -131,10 +127,10 @@
 			$container.append(item);
 		}
 
-		//移除一个子组件。
+		//移除一个子组件
 		removeItem(params) {
 			let $container = this.#getItemsContainer();
-			if ($.isNumeric(params)) {
+			if (uix.isNumber(params)) {
 				$container.children().eq(params).element("destroy");
 			} else {//params为选择器
 				$container.children(params).element("destroy");
@@ -160,6 +156,7 @@
 		}
 
 		//向左，向上操作，内容溢出才会操作
+		//todo：移动指定个数
 		doNextAct(count = 1) {
 			let $container = this.#getItemsContainer();
 			let state = this.getState();
@@ -178,6 +175,7 @@
 		}
 
 		//向右，向下操作，内容溢出才会操作
+		//todo：移动指定个数
 		doPrevAct(count = 1) {
 			let $container = this.#getItemsContainer();
 			let state = this.getState();
@@ -198,6 +196,7 @@
 	//绑定到uix变量
 	uix.ScrollPane = ScrollPane;
 
+	//todo：重构成uix.make格式
 	$.fn.scrollpane = function (options, ...params) {
 		if (typeof options === "string") {
 			let method = $.fn.scrollpane.methods[options];
@@ -227,11 +226,7 @@
 
 	//所有方法
 	$.fn.scrollpane.methods = {
-		size: $jq => $jq.asComp().size(),
-		addItem: ($jq, params) => uix.each($jq, t => t.addItem(params)),//添加一个组件，params为子组件的dom(wrapper)
-		removeItem: ($jq, params) => uix.each($jq, t => t.removeItem(params)),//从滚动面板移除，params为索引，或组件id
-		doPrevAct: ($jq, params) => uix.each($jq, t => t.doPrevAct(params)),//params即左移数量
-		doNextAct: ($jq, params) => uix.each($jq, t => t.doNextAct(params)),//params即右移数量
+		//
 	};
 
 	$.fn.scrollpane.defaults = $.extend(true, {}, $.fn.panel.defaults, {

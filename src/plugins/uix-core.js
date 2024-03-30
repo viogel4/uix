@@ -406,13 +406,17 @@
 		//是否字符串
 		isString(str) {
 			return typeof str === "string";
+		},
+		//是否jQuery对象
+		isJQuery(obj) {
+			return obj instanceof jQuery;
 		}
 		/////
 	};
 
 	//解析行内样式，返回行内样式对象
 	uix.parseStyle = function (cssObject, key) {
-		if (typeof key === "string" && key.trim().length > 0) {
+		if (uix.isString(key) && key.trim().length > 0) {
 			cssObject[key] = parse(cssObject[key]);//更改源对象
 			return cssObject;
 		} else {
@@ -420,7 +424,7 @@
 		}
 
 		function parse(cssStyle) {
-			if (typeof cssStyle === "string") {
+			if (uix.isString(cssStyle)) {
 				let cssStyleArr = cssStyle.split(/\s*;\s*/);
 				let cssStyleMap = {};
 				cssStyleArr.forEach(t => {
@@ -430,7 +434,7 @@
 					}
 				});
 				return cssStyleMap;
-			} else if ($.isPlainObject(cssStyle)) {
+			} else if (uix.isObject(cssStyle)) {
 				return cssStyle;
 			} else {
 				return {};
@@ -449,7 +453,7 @@
 
 	//解析类名称，返回一个对象，以类名称为key，以true和false为值
 	uix.parseClass = function (cssObject, key) {
-		if (typeof key === "string" && key.trim().length > 0) {
+		if (uix.isString(key) && key.trim().length > 0) {
 			cssObject[key] = parse(cssObject[key]);//更改源对象
 			return cssObject;
 		} else {
@@ -458,11 +462,11 @@
 
 		function parse(cssClass) {
 			let cssClassArr = [];
-			if (typeof cssClass === "string") {
+			if (uix.isString(cssClass)) {
 				cssClassArr = cssClass.split(/\s+/);
-			} else if (Array.isArray(cssClass)) {
+			} else if (uix.isArray(cssClass)) {
 				cssClassArr = cssClass;
-			} else if ($.isPlainObject(cssClass)) {
+			} else if (uix.isObject(cssClass)) {
 				return cssClass;//如果已经是对象，则原样返回
 			} else {//除以上类型外的其它类型
 				return {};
@@ -517,13 +521,13 @@
 
 	//解析一个对象的style和class
 	uix.parseAll = function (cssObject, classKey = "cssClass", styleKey = "cssStyle") {
-		if ($.isPlainObject(cssObject)) {
+		if (uix.isObject(cssObject)) {
 			uix.parseClass(cssObject, classKey);//直接修改原对象，无须返回值
 			uix.parseStyle(cssObject, styleKey);//直接修改原对象，无须返回值
 			return cssObject;
 		} else {
 			console.log(cssObject);
-			throw new Error("要解析的对象不是合法对象");
+			throw new Error("目标解析对象不是合法对象");
 		}
 	};
 

@@ -38,6 +38,27 @@ todo:
 将施加在body上的collapsed，改为施加到card组件上。更改样式表。
 
 
+47.scrollpane组件，未完成，有很多todo，尤其是第200行，创建scrollpane实例，必须重构为uix.make形式，否则一些方法不能向上查找。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 3.表单。
 1.filebox：支持单图，多图，缩略预览

@@ -3,17 +3,17 @@
 	 * 所有组件的基础继承类，不作为容器使用，是不可分割的组件，不能包含其它组件
 	 */
 	class Element {
-		//公有静态变量，开发者可自由设置重写
+		//公共静态变量，开发者可自由设置重写
 		static initialCssStyle = {}; //初始行内样式
 		static initialCssClass = ["bsb"]; //初始类名称
 		static initialOptions = {}; //全局默认初始配置
 
 		//私有成员变量
-		#domSrc; //dom源
+		#domSrc; //源dom，亦即api操作的dom
 		#domTarget;//目标dom，有可能是domSrc，也有可能是domSrc的引用dom
 		#opts; //组件配置项，object类型
 		#state; //组件状态表，object类型
-		#roles;//组件角色，数组，可变
+		#roles;//组件角色，数组
 
 		//构造函数，opts中的cssStyle和cssClass，优先级高于后面的参数
 		constructor(domSrc, opts = {}) {
@@ -21,25 +21,25 @@
 			//获取domSrc的递归引用
 			this.#domTarget = uix.getRef(domSrc);
 
-			this.#opts = uix.handleOptions({}, {
+			this.#opts = uix.options({}, {
 				cssStyle: Element.initialCssStyle,
 				cssClass: Element.initialCssClass,
 			}, Element.initialOptions, opts);
 
 			//组件状态
 			this.#state = {
-				options: this.#opts,//配置项
-				comp: this,//当前组件对象
-				src: this.#domSrc,//源dom
-				target: this.#domTarget,//目标dom
+				options: this.#opts,	//配置项
+				comp: this,				//当前组件实例
+				src: this.#domSrc,		//源dom
+				target: this.#domTarget //目标dom
 			};
 
 			//给组件id赋值
 			if (uix.isNotValid(this.#opts.id)) {
-				this.#opts.id = uix.compId();
+				this.#opts.id = uix.compId();//随机生成id
 			}
 
-			//角色
+			//组件角色
 			if (uix.isString(this.#opts.role)) {
 				let roles = this.#opts.role.trim().split(/\s+/);
 				this.#roles = [...new Set(roles)];//数组去重
@@ -73,11 +73,11 @@
 
 		//获取组件类型
 		getCompType() {
-			return "element";
+			return this.constructor.name.toLowerCase()
 		}
 
-		//获取所有附属组件元素，返回jquery对象，在当前文档中查找，可根据需要重写
-		getAccessories(win = window) {
+		//获取所有从属组件元素，返回jquery对象，在当前document中查找，可根据需要重写
+		getAssistants(win = window) {
 			return $("[data-comp-for=" + this.getId() + "]", win.document);
 		}
 
@@ -91,12 +91,12 @@
 			return $(this.getTarget()).children(selector);
 		}
 
-		//判断是否拥有某个指定的角色
+		//判断组件是否拥有某个指定的角色
 		hasRole(r) {
-			return uix.hasRole(this.getTarget(), r);
+			return uix.hasAllRoles(this.getTarget(), [r]);
 		}
 
-		//获取所有角色
+		//获取所有角色，如果没有角色，返回空数组
 		getRoles() {
 			return uix.isArray(this.#roles) ? this.#roles : [];
 		}
@@ -130,20 +130,20 @@
 			//设置内容
 			if (uix.isString(opts.content)) {
 				$(target).html(opts.content);
-			} else if (opts.content instanceof jQuery) {//如果content是在文档中已存在的对象
+			} else if (uix.isJQuery(opts.content)) {//如果content是在文档中已存在的对象
 				$(target).empty().append(opts.content);
 			}
 
-			//组件唯一标识
+			//组件唯一标识。使用attr可以保证可见性
 			$(target).attr("data-comp-id", opts.id);
 
-			//组件状态，存储到应用组件中，而不是当前组件中
+			//组件状态，存储到目标dom中，而不是源dom中
 			$.data(target, "comp-state", this.getState());
 
 			//组件类型
 			$(target).attr("data-comp-type", this.getCompType());
 
-			//设置附属组件，for的值为组件id
+			//设置从属组件，for的值为组件id
 			if (opts.for) {
 				$(target).attr("data-comp-for", opts.for);
 			}
@@ -192,8 +192,9 @@
 		}
 
 		/**
-		 * 注册事件。组件禁用状态下，事件不会移除，但会失效。
+		 * 注册事件。
 		 * 注意：仅适用于使用api添加的事件，使用jquery手动添加的事件不受控制。
+		 * 注意：组件禁用状态下，事件不会移除，但会失效。
 		 */
 		on(event, handler) {
 			let old = handler;
@@ -228,7 +229,7 @@
 			$(this.getTarget()).remove();
 
 			//销毁附属组件
-			this.getAccessories().element("destroy");
+			this.getAssistants().element("destroy");
 		}
 
 		//以jquery对象的方式继续执行其它操作
@@ -244,13 +245,13 @@
 
 	//使用此方法创建组件，会复用之前的配置项
 	$.fn.element = function (options, ...params) {
-		return uix.applyOrNew(this, "element", null, Element, options, ...params);
+		return uix.make(this, Element, options, ...params);
 	};
 
 	//所有方法
 	$.fn.element.methods = {
 		options: $jq => $jq.asComp().getOptions(),//获取配置项
-		compType: $jq => $jq.asComp().getCompType(),//获取uix组件类型
+		compType: $jq => $jq.asComp().getCompType(),//获取组件类型
 		class: ($jq, params) => uix.each($jq, t => t.assignClass(params)),  //设置类名称到配置项中，但不进行即时渲染
 		style: ($jq, params) => uix.each($jq, t => t.assignStyle(params)),  //设置内联样式到配置项中，但不进行即时渲染
 		//使用此api添加的事件会受enabled状态影响，纯手动添加的则不会
@@ -266,7 +267,7 @@
 		//role: "",//组件角色，用于指定作为上级组件的角色，可以有多个值，使用空格分隔
 		//cssStyle: {}, //默认内联样式
 		//cssClass: [], //默认类名
-		//content: "",//初始html内容
+		//content: "",//初始html内容，也可以是jquery对象
 		//enabled: true,//设置组件是否启用
 	};
 

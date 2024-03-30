@@ -1,13 +1,13 @@
 (function ($) {
 	/**
-	 * 和Element的最大区别是，panel是作为容器使用，内部可包含组件（或子容器）
+	 * 和Element的最大区别是，panel是作为容器使用，内部可包含其它组件
 	 */
 	class Panel extends uix.Element {
 		//静态变量
 		static initialCssStyle = {}; //初始行内样式
 		static initialCssClass = ["dpi-f", "psr", "ofh"]; //初始类名称
 
-		//默认配置
+		//初始全局配置
 		static initialOptions = {
 			layout: {
 				type: "column"
@@ -16,16 +16,12 @@
 
 		//作为既定的规约存在：不对domSrc下的文本内容进行检查，不允许直接包含文本内容。
 		constructor(domSrc, opts = {}) {
-			let options = uix.handleOptions({}, {
+			let options = uix.options({}, {
 				cssClass: Panel.initialCssClass,
 				cssStyle: Panel.initialCssStyle
 			}, Panel.initialOptions, opts);
 
 			super(domSrc, options);
-		}
-
-		getCompType() {
-			return "panel";
 		}
 
 		render() {
@@ -123,7 +119,8 @@
 		//移除遮罩，非递归级联操作
 		removeMask() {
 			$(this.getTarget()).children().each((_, t) => {
-				if (uix.hasRole(t, "panel-mask")) {
+				let comp = $(t).asComp();
+				if (comp && comp.hasRole("panel-mask")) {
 					$(t).remove();
 					return false;
 				}
@@ -218,13 +215,13 @@
 			return false;//返回false代表未创建
 		}
 
-		//查找拥有指定角色的后代
-		descendantByRole(role) {
+		//查找拥有指定角色的后代组件
+		descendantsByRole(role) {
 			let $descendant = $(this.getTarget()).find("[data-comp-role]");
 			return uix.compsByRole($descendant, role);
 		}
 
-		//查找拥有指定角色的子代
+		//查找拥有指定角色的子代组件
 		childrenByRole(role) {
 			let $children = $(this.getTarget()).children("[data-comp-role]");
 			return uix.compsByRole($children, role);
@@ -247,7 +244,7 @@
 	uix.Panel = Panel;
 
 	$.fn.panel = function (options, ...params) {
-		return uix.applyOrNew(this, "panel", "element", Panel, options, ...params);
+		return uix.make(this, Panel, options, ...params);
 	};
 
 	//所有方法

@@ -3,7 +3,7 @@
 }
 
 /* 窗口标题右侧工具栏小按钮 */
-.wbtn>[data-comp-role~=start-icon] {
+.wbtn>[data-comp-role~=si] {
 	width: 16px;
 	height: 16px;
 	display: inline-block;
