@@ -1,16 +1,17 @@
-[data-comp-type=radio]>[data-comp-role~=body] {
+[data-comp-type=radio]>[data-comp-role~=outbody] {
     width: var(--uix-d4u, 1.25rem);
     height: var(--uix-d4u, 1.25rem);
     border-width: 1.5px;
     border-radius: 50%;
     border-color: #c2c2c2;
+    border-style: solid;
 }
 
-[data-comp-type=radio].checked>[data-comp-role~=body] {
+[data-comp-type=radio].checked>[data-comp-role~=outbody] {
     border-color: #5FB878;
 }
 
-[data-comp-type=radio].checked>[data-comp-role~=body]::after {
+[data-comp-type=radio].checked>[data-comp-role~=outbody]::after {
     content: '';
     display: block;
     /* todo:使用40%并不能准确的计算出8px */
@@ -25,7 +26,7 @@
     margin: 0 5px;
 }
 
-[data-comp-type=radio].checked>[data-comp-role~=body].uix-scale-spring {
+[data-comp-type=radio].checked>[data-comp-role~=outbody].uix-scale-spring {
     animation-name: uix-scale-spring;
     animation-duration: .3s;
     animation-fill-mode: both;

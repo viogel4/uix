@@ -1,1 +1,1 @@
-[data-comp-role=dropdown-switch]>[data-comp-role=start-icon]{transition:all .3s}[data-comp-role=dropdown-switch]:not(.closed)>[data-comp-role=start-icon]{transform:rotateZ(180deg)}
+[data-comp-role=dropdown-switch]>[data-comp-role~=si]{transition:all .3s}[data-comp-role=dropdown-switch]:not(.closed)>[data-comp-role~=si]{transform:rotateZ(180deg)}

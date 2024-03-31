@@ -3,35 +3,42 @@
      * 表单组件：单选按钮
      */
     class Radio extends uix.Input {
+        static #DEFAULT_ORDER = 1000;
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = ["aic", "-ofh"]; //初始类名称
-        static initialOptions = {//全局默认配置
-            body: {
+
+        //全局初始配置
+        static initialOptions = {
+            inbody: false,
+            outbody: {
                 act: "set",
-                target: "[data-comp-role~=body]",
+                target: "[data-comp-role~=outbody]",
                 compType: "button",
-                compRole: "body",
-                order: uix.Panel.DEFAULT_ORDER - 20,
+                compRole: "outbody",
+                order: Radio.#DEFAULT_ORDER - 20,
                 opts: {
                     bordered: true,
                     cssClass: "fgw-1 fsk-1 fcc",
                     onClick: function (e) {
                         let radio = uix.closestComp(this.getTarget(), "Radio");
-                        radio.toggleChecked(e);
+                        radio.setChecked(true, e);
                     }
                 }
             },
-            onChecked(checked, group) {
+            //默认选中后的行为
+            onChecked(checked) {
                 if (checked) {
-                    $(this.getTarget()).children("[data-comp-role~=body]").addClass("uix-scale-spring");
+                    $(this.getTarget()).children("[data-comp-role~=outbody]").addClass("uix-scale-spring");
                 } else {
-                    $(this.getTarget()).children("[data-comp-role~=body]").removeClass("uix-scale-spring");
+                    $(this.getTarget()).children("[data-comp-role~=outbody]").removeClass("uix-scale-spring");
                 }
 
+                let opts = this.getOptions();
+
                 if (checked) {//同组的其它radio，设置为取消选中
-                    if (uix.isValid(group)) {
-                        let grps = group.split(/\s+/);//多个组名使用空格分隔
+                    if (uix.isValid(opts.group)) {
+                        let grps = opts.group.split(/\s+/);//多个组名使用空格分隔
                         grps.forEach(it => {
                             $("[data-comp-type=radio][data-comp-group~=" + it + "]").not(this.getTarget()).each(function () {
                                 $(this).asComp().setChecked(false);
@@ -39,11 +46,13 @@
                         });
                     }
                 }
+
+                return true;
             }
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: Radio.initialCssClass,
                 cssStyle: Radio.initialCssStyle
             }, Radio.initialOptions, opts);
@@ -61,13 +70,7 @@
             super(domSrc, options);
         }
 
-        getCompType() {
-            return "radio";
-        }
-
-        //如有必要，重写父类方法
         render() {
-            let me = this;
             let opts = this.getOptions();
 
             super.render();
@@ -77,17 +80,25 @@
                 $(this.getTarget()).attr("data-comp-group", opts.group);
             }
 
-            //点击label触发事件
-            let $label = $(this.getTarget()).children("[data-comp-role~=label]");
-            if ($label.length > 0) {
-                $label.asComp().assignClass("csr-p").on("click", function (e) {
-                    me.toggleChecked(e);
-                });
-            }
+            this.setLabelHandler();
 
             //设置是否选中
             this.setChecked(!!opts.checked);
             ////////////////
+        }
+
+
+        //给label设置事件监听器
+        setLabelHandler(handler) {
+            let me = this;
+
+            //点击label触发事件
+            let $label = $(this.getTarget()).children("[data-comp-role~=label]");
+            if ($label.length > 0) {
+                $label.asComp().assignClass("csr-p").off("click.uix-radio-click").on("click.uix-radio-click", handler || (e => me.setChecked(true, e)));
+            }
+
+            return this;
         }
 
         #checked = false;//组件选中状态
@@ -99,8 +110,8 @@
             }
 
             //事件处理回调函数，选中前触发，由用户自定义
-            if ($.isFunction(opts.onCheck)) {
-                let pass = opts.onCheck.call(this, checked, e);
+            if (uix.isFunc(opts.onBeforeCheck)) {
+                let pass = opts.onBeforeCheck.call(this, checked, e);
                 if (pass === false) {
                     return this;
                 }
@@ -111,17 +122,23 @@
             //选中样式设置
             $(this.getTarget()).assignClass(this.#checked ? "checked" : "-checked");
 
-            let group = this.getOptions().group;//当前radio的组名
-
             //事件处理回调函数，选中后触发，用户也可自定义
-            if ($.isFunction(opts.onChecked)) {
-                opts.onChecked.call(this, this.#checked, group);
+            if (uix.isFunc(opts.onChecked)) {
+                let pass = opts.onChecked.call(this, this.#checked, e);
+                if (pass === false) {
+                    return this;
+                }
             }
 
             //设置表单提交的值
             if (this.#checked) {
                 let val = uix.isValid(opts.value) ? opts.value : this.getText();
                 super.setValue(val, false);
+            }
+
+            //设置表单值后触发
+            if (uix.isFunc(opts.onAfterCheck)) {
+                opts.onAfterCheck.call(this, this.#checked, e);
             }
 
             return this;
@@ -131,11 +148,6 @@
         getChecked() {
             return this.#checked;
         }
-
-        //切换选中状态
-        toggleChecked(e) {
-            return this.setChecked(true, e);
-        }
         ////
     }
 
@@ -143,23 +155,7 @@
     uix.Radio = Radio;
 
     $.fn.radio = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.radio.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).input(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "radio", options);
-
-            //每次会重建对象，重建对象时，会合并扩展之前的配置
-            let elem = new Radio(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, Radio, options, ...params);
     };
 
     //所有方法
@@ -169,9 +165,10 @@
 
     $.fn.radio.defaults = $.extend(true, {}, $.fn.input.defaults, {
         editable: true,//单选按钮的editable和input的editable含义有区别，单选按钮的editable表示可通过点击按钮选中
-        group: null,//组名称，同一组名称内的Radio实例可以实现单选功能。支持使用空格分隔多个组名。
+        group: "",//组名称，同一组名称内的Radio实例可以实现单选功能。支持使用空格分隔多个组名。
         checked: false,//是否默认选中
-        //onCheck: null,//当组件选中状态改变时所触发的事件，选中前触发
-        //onChecked: null,//选中后触发
+        //onBeforeCheck: null,//当组件选中状态改变时所触发的事件，选中前触发
+        //onChecked:null,
+        //onAfterCheck: null,//选中后触发
     });
 })(jQuery);

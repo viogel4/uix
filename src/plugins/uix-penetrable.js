@@ -80,7 +80,7 @@
 				$.data(dom, "comp-window", win || parent);
 
 				//重新初始化组件
-				$(dom)[compType](uix.handleOptions(comp.getOptions(), {
+				$(dom)[compType](uix.options(comp.getOptions(), {
 					cssStyle: {
 						top: offset.top + "px",
 						left: offset.left + "px"

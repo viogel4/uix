@@ -1,17 +1,18 @@
-[data-comp-type=checkbox]>[data-comp-role~=body] {
+[data-comp-type=checkbox]>[data-comp-role~=outbody] {
     width: var(--uix-d4u, 1.25rem);
     height: var(--uix-d4u, 1.25rem);
     border-width: 1.5px;
     border-color: #c2c2c2;
+    border-style: solid;
 }
 
-[data-comp-type=checkbox].checked>[data-comp-role~=body],
-[data-comp-type=checkbox].half-checked>[data-comp-role~=body] {
+[data-comp-type=checkbox].checked>[data-comp-role~=outbody],
+[data-comp-type=checkbox].half-checked>[data-comp-role~=outbody] {
     border-color: #5FB878;
 }
 
-/* 半选中状态 */
-[data-comp-type=checkbox].half-checked>[data-comp-role~=body]::after {
+/* 半选状态 */
+[data-comp-type=checkbox].half-checked>[data-comp-role~=outbody]::after {
     content: '';
     display: block;
     width: 8px;
