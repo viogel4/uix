@@ -31,8 +31,8 @@
 }
 
 /* 任务栏中的最小化窗口鼠标滑过时的颜色 */
-.window-task-bar [data-comp-role=header]:hover,
-.window-task-bar [data-comp-role=panel-mask]:hover {
+.window-task-bar [data-comp-role~=header]:hover,
+.window-task-bar [data-comp-role~=panel-mask]:hover {
 	background-color: var(--uix-orange);
 	opacity: .5;
 }

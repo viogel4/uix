@@ -7,7 +7,7 @@
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
         static initialOptions = {
-            inBody: {
+            inbody: {
                 act: "set",
                 target: "[data-comp-role~=body]",
                 compType: "spirit",
@@ -15,7 +15,7 @@
                     body: {
                         act: "set",
                         target: "[data-comp-role~=body]",
-                        elem: "<input type='password' class='uix-input-facade' autocomplete='off'>",
+                        elem: "<input type='password' class='uix-input-display' autocomplete='off'>",
                         compType: "element",
                         opts: {
                             cssClass: "px-2 py-1 no-border fit fgw-1 fsk-1"
@@ -28,11 +28,12 @@
                         compType: "button",
                         compRole: "switch",
                         opts: {
-                            startIcon: "ico ico-20 iconify-eye-close",
+                            icon: "ico ico-20 iconify-eye-close",
+                            cssClass: "mr-1",
                             onClick: function () {
                                 let $btn = $(this.getTarget());
-                                let $icon = $btn.find("[data-comp-role=start-icon]");
-                                let $input = $btn.parent().children(".uix-input-facade");//表单显示
+                                let $icon = $btn.find("[data-comp-role~=si]");
+                                let $input = $btn.parent().children(".uix-input-display");//表单显示
 
                                 //切换按钮图标
                                 if ($icon.hasClass("iconify-eye-close")) {
@@ -50,16 +51,12 @@
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: PasswordBox.initialCssClass,
                 cssStyle: PasswordBox.initialCssStyle
             }, PasswordBox.initialOptions, opts);
 
             super(domSrc, options);
-        }
-
-        getCompType() {
-            return "passwordbox";
         }
         ////
     }
@@ -68,23 +65,7 @@
     uix.PasswordBox = PasswordBox;
 
     $.fn.passwordbox = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.passwordbox.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).textbox(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "passwordbox", options);
-
-            //每次会重建对象，重建对象时，会融合扩展之前的配置
-            let elem = new PasswordBox(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, PasswordBox, options, ...params);
     };
 
     //所有方法

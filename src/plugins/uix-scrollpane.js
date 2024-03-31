@@ -18,7 +18,7 @@
 					compType: "button",
 					order: uix.Panel.DEFAULT_ORDER - 10,
 					opts: {
-						startIcon: "ico ico-16 iconify-arrow-left",
+						icon: "ico ico-16 iconify-arrow-left",
 						cssClass: "fsk-0 dpn",
 						onClick() {
 							let comp = uix.closestComp(this.getTarget(), "ScrollPane");
@@ -54,7 +54,7 @@
 					compType: "button",
 					order: uix.Panel.DEFAULT_ORDER + 10,
 					opts: {
-						startIcon: "ico ico-16 iconify-arrow-right",
+						icon: "ico ico-16 iconify-arrow-right",
 						cssClass: "fsk-0 dpn",
 						onClick() {
 							let comp = uix.closestComp(this.getTarget(), "ScrollPane");
@@ -94,6 +94,14 @@
 		//如有必要，重写父类方法
 		render() {
 			let opts = this.getOptions();
+			let target = this.getTarget();
+
+			let $content = $(target).children(":not([data-comp-role])");
+			if ($content.length > 0) {
+				$content = $("<div data-comp-role='container'>").append($content);
+				$content = $("<div data-comp-role='body'>").append($content);
+				$(target).append($content);
+			}
 
 			super.render();
 
@@ -198,30 +206,7 @@
 
 	//todo：重构成uix.make格式
 	$.fn.scrollpane = function (options, ...params) {
-		if (typeof options === "string") {
-			let method = $.fn.scrollpane.methods[options];
-			if (method) {
-				return method($(this), ...params);
-			} else {
-				return $(this).panel(options, ...params);
-			}
-		}
-
-		options = options || {};
-		return $(this).each(function () {
-			let opts = uix.compOptions(this, "scrollpane", options);
-
-			let $content = $(this).children(":not([data-comp-role])");
-			if ($content.length > 0) {
-				$content = $("<div data-comp-role='container'>").append($content);
-				$content = $("<div data-comp-role='body'>").append($content);
-				$(this).append($content);
-			}
-
-			//每次会重建对象，重建对象时，会融合扩展之前的配置
-			let elem = new ScrollPane(this, opts);
-			elem.render(); //手动执行渲染
-		});
+		return uix.make(this, ScrollPane, options, ...params);
 	};
 
 	//所有方法

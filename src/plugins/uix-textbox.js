@@ -6,20 +6,20 @@
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
-        static initialOptions = {};
+        static initialOptions = {};//初始全局配置
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: TextBox.initialCssClass,
                 cssStyle: TextBox.initialCssStyle
             }, TextBox.initialOptions, opts);
 
-            //如果是多行文本框
+            //如果是多行文本框，即文本域
             if (options.multiline) {
-                if ($.isPlainObject(options.inBody)) {
-                    uix.applyKey(options.inBody, "opts.body.elem", "<textarea class='uix-input-facade' style='resize:none;'></textarea>", true);
+                if (uix.isObject(options.inbody)) {
+                    uix.applyKey(options.inbody, "opts.body.elem", "<textarea class='uix-input-display' style='resize:none;'></textarea>", true);
                 } else {
-                    options.inBody = {
+                    options.inbody = {
                         act: "set",
                         target: "[data-comp-role~=body]",
                         compType: "spirit",
@@ -27,7 +27,7 @@
                             body: {
                                 act: "set",
                                 target: "[data-comp-role~=body]",
-                                elem: "<textarea class='uix-input-facade' style='resize:none;' autocomplete='off'></textarea>",
+                                elem: "<textarea class='uix-input-display' style='resize:none;' autocomplete='off'></textarea>",
                                 compType: "element",
                                 opts: {
                                     cssClass: "px-2 py-1 no-border fit fgw-1 fsk-1"
@@ -42,34 +42,13 @@
             super(domSrc, options);
             //////
         }
-
-        getCompType() {
-            return "textbox";
-        }
-        ////
     }
 
     //绑定到uix变量
     uix.TextBox = TextBox;
 
     $.fn.textbox = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.textbox.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).input(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "textbox", options);
-
-            //每次会重建对象，重建对象时，会合并扩展之前的配置
-            let elem = new TextBox(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, TextBox, options, ...params);
     };
 
     //所有方法

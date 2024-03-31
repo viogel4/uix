@@ -1,5 +1,5 @@
 /* 使中文标题尽量垂直居中 */
-[data-comp-type=dialog]>[data-comp-role=header]>[data-comp-role=title] {
+[data-comp-type=dialog]>[data-comp-role~=header]>[data-comp-role~=title] {
     margin-top: -2px;
 }
 
@@ -11,7 +11,7 @@
     max-height: 300px;
 }
 
-.messager[data-comp-type=dialog]>[data-comp-role=body]>div {
+.messager[data-comp-type=dialog]>[data-comp-role~=body]>div {
     padding: 15px;
 }
 
@@ -30,7 +30,7 @@
     text-align: center;
 }
 
-.uix-iframe-dialog>[data-comp-role=body] iframe {
+.uix-iframe-dialog>[data-comp-role~=body] iframe {
     outline: none;
     border: none;
     width: 100%;

@@ -95,7 +95,7 @@
 					order: Button.#DEFAULT_ORDER,
 					opts: {
 						content: text,
-						cssClass: "usn ellipsis"
+						cssClass: "usn fsn ellipsis"
 					}
 				};
 			} else {

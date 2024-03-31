@@ -88,6 +88,7 @@
 				}
 			}
 
+
 			//追加自定义头部工具栏
 			if (uix.isArray(options.headerTools) && options.headerTools.length > 0) {
 				options.headerTools.forEach(it => headerTools.push(it));
@@ -109,6 +110,7 @@
 						bordered: "btd"
 					}
 				}, options.footer);
+
 				options.footer = footer;
 				//
 			}

@@ -1,34 +1,22 @@
 (function ($) {
-    //比较两个数组是否相等，数组中的元素限定只能是整数或字符串，本比较方法会过滤重复元素
-    function arrayEquals(a, b) {
-        if (!Array.isArray(a) || !Array.isArray(b)) {
-            return a === b;
-        }
-        let as = new Set(a);
-        let bs = new Set(b);
 
-        if (as.length !== bs.length) {
-            return false;
-        }
-
-        as = [...as].sort();
-        bs = [...bs].sort();
-        return JSON.stringify(as) === JSON.stringify(bs);
-    }
     /**
      * 表单组件：下拉选择框，支持单选或多选
      */
     class ComboBox extends uix.Combo {
+        static #DEFAULT_ORDER = 1000;
+
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
-        static initialOptions = {}; //全局默认配置
+        static initialOptions = {}; //初始全局配置
+
 
         //下拉项顺序
-        #listItemOrder = uix.Panel.DEFAULT_ORDER;
+        #listItemOrder = ComboBox.#DEFAULT_ORDER;
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: ComboBox.initialCssClass,
                 cssStyle: ComboBox.initialCssStyle
             }, ComboBox.initialOptions, opts);
@@ -43,6 +31,7 @@
                     let group = $(it).attr("label");//下拉列表项组名称
                     let g = { name: group, children: [] };
                     data.push(g);
+
                     //遍历组下的option
                     $(it).children("option").each((_, o) => {
                         g.children.push({
@@ -52,7 +41,7 @@
                     });
                 });
 
-                //直属option，不隶属于optgroup之下
+                //获取直属option，不隶属于optgroup之下的
                 let $options = $(ref).children("option");
                 if ($options.length > 0) {
                     let g = { name: "默认", children: [] };
@@ -64,6 +53,7 @@
                         });
                     });
                 }
+
                 options.data = data;
             }
 
@@ -72,28 +62,42 @@
             options = this.getOptions();
 
             //一个combo组件只有一个下拉面板
-            let dropdown = options.layout.items.find(it => uix.matchRoles("dropdown-panel", uix.getItemRoles(it)));
+            let dropdown = options.layout.items.find(it => {
+                let roles = [];
+                if (it.compRole) {
+                    roles = roles.concat(it.compRole.split(/\s+/));//角色可以使用空格进行分隔
+                }
+                let r = uix.applyKey(it, "opts.role", "");
+                if (r) {
+                    roles = roles.concat(r.split(/\s+/));
+                }
+                return roles.includes("dropdown-panel");
+            });
+
             let oldFn = dropdown.opts.onBeforeOpen;
             let me = this;
 
             //展开下拉面板之前，设置下拉项的选中状态，支持多选
             dropdown.opts.onBeforeOpen = function (dom) {
-                let val = me.getValue();//获取表单组件选中的值，返回值可以是数组
-                if (uix.isValid(val)) {
-                    if (!Array.isArray(val)) {
-                        val = [val];
+                let vals = me.getValue();//获取表单组件选中的值，返回值可以是数组
+
+                if (uix.isValid(vals)) {
+                    if (!uix.isArray(vals)) {
+                        vals = [vals];
                     }
 
-                    let listitems = $(dom).find("[data-comp-role~=body]>[data-comp-role~=list-item]");
-                    listitems.each(function () {
+                    //获取所有下拉项
+                    let lis = $(dom).find("[data-comp-role~=body]>[data-comp-role~=list-item]");
+                    lis.each(function () {
                         let item = $(this).asComp();
                         let opts = item.getOptions();
+
                         //如果下拉列表项的值在选中数组中存在，则选中
-                        item.assignClass(val.indexOf(opts.data.value) >= 0 ? "selected" : "-selected");
+                        item.assignClass(vals.includes(opts.data.value) ? "selected" : "-selected");
                     });
                 }
 
-                if ($.isFunction(oldFn)) {
+                if (uix.isFunc(oldFn)) {
                     return oldFn.call(this, dom);
                 }
                 return true;
@@ -102,35 +106,31 @@
             ////////////////////
         }
 
-        getCompType() {
-            return "combobox";
-        }
-
-        //设置值，value可以是基本数据类型（整数或字符串），或由其构成的数组
+        //设置表单值，value可以是基本数据类型（整数或字符串），或是由其构成的数组
         setValue(value) {
             if (uix.isNotValid(value)) {
                 return this;
             }
 
-            let val = Array.isArray(value) ? value : [value];//值数组
+            let vals = uix.isArray(value) ? value : [value];//值数组
             let text = [];//显示文本数组
 
-            //和旧值比较，判断是否发生变化
+            //和旧值比较，判断是否发生变化，发生变化则触发onChange函数
             let old = this.getValue();
-            if (!arrayEquals(value, old) && uix.isValid(old)) {//如果值发生变化，且有旧值
+            if (uix.isValid(old) && !equals(value, old)) {//如果值发生变化，且有旧值
                 let opts = this.getOptions();
-                if ($.isFunction(opts.onChange)) {
+                if (uix.isFunc(opts.onChange)) {
                     opts.onChange.call(this, value, old);
                 }
             }
 
             //取出值所对应的text
             let panel = $(super.getPanel()).asComp();
-            let listitems = $(panel.getTarget()).find("[data-comp-role~=body]>[data-comp-role~=list-item]");
-            listitems.each(function () {
+            let lis = $(panel.getTarget()).find("[data-comp-role~=body]>[data-comp-role~=list-item]");
+            lis.each(function () {
                 let item = $(this).asComp();
-                let opts = item.getOptions();
-                if (val.indexOf(opts.data.value) >= 0) {//indexOf使用精确匹配即三等号
+                let opts = item.getOptions();//每个配置项最多有id、text、value三个属性
+                if (vals.includes(opts.data.value)) {//indexOf使用精确匹配即三等号
                     text.push(opts.data.text);
                 }
             });
@@ -154,15 +154,17 @@
         }]; */
         #data;
         setData(data, forceShowGroup) {
-            let showGroup = true;//是否显示组
+            let showGroup = true;//是否显示组名称
             this.#data = data;
-            this.clearItems();//清除所有已存在的下拉项
+
+            //清除所有已存在的下拉项
+            this.clearItems();
 
             if (uix.isNotValid(data)) {
                 return;
             }
 
-            if (!Array.isArray(this.#data)) {
+            if (!uix.isArray(this.#data)) {
                 throw new Error("不合法的数据(参数必须为数组格式)");
             }
 
@@ -171,9 +173,11 @@
             }
 
             //是否对下拉项进行分组，并显示组名称
-            showGroup = uix.isValid(forceShowGroup) ? forceShowGroup : showGroup;
+            if (uix.isValid(forceShowGroup)) {
+                showGroup = forceShowGroup;
+            }
 
-            //遍历组
+            //遍历组数组
             this.#data.forEach(g => {
                 if (showGroup) {//先添加组
                     let gopts = {
@@ -188,7 +192,7 @@
                             cssClass: "fsk-0"
                         }
                     };
-                    this.#addPanelItem(gopts);
+                    this.#addDropdownItem(gopts);
                 }
 
                 //再添加组下的项
@@ -216,44 +220,45 @@
             if (uix.isValid(value)) {//如果表单已有值，在更新data之后，重新设置值
                 this.setValue(value);//重新设置值，是因为重新更新data之后，下拉项内容已经改变
             }
+            
             return this;
         }
 
-        //获取数据
+        //获取下拉选项数据
         getData() {
             return this.#data;
         }
 
-        //清空数据
+        //清空下拉选项数据
         clearData() {
             this.setData(null);
             return this;
         }
 
-        //添加一个面板子组件
-        #addPanelItem(opts) {
+        //添加一个面板下拉项组件
+        #addDropdownItem(opts) {
             //下拉面板组件，实际上是一个Dialog
             let panel = $(this.getPanel()).asComp();
 
             //添加一个子组件
-            $(panel.getBody()).asComp().makeItem(opts);
+            panel.getBody().makeItem(opts);
             return this;
         }
 
         //添加一个下拉项
         addItem(iopts) {
-            let opts = uix.handleOptions({
+            let opts = uix.options({
                 act: "add",
                 compType: "button",
                 compRole: "list-item",
                 order: this.#listItemOrder++,
                 opts: {
-                    startIcon: "ico ico-16"
+                    icon: "ico ico-16"
                 }
             }, {
                 opts: {
                     id: uix.isValid(iopts.id) ? iopts.id : undefined,
-                    startIcon: uix.isValid(iopts.icon) ? iopts.icon : undefined,
+                    icon: uix.isValid(iopts.icon) ? iopts.icon : undefined,
                     buttonText: uix.isValid(iopts.text) ? iopts.text : undefined,
                     data: iopts
                 }
@@ -262,7 +267,7 @@
             });
 
             //添加一个面板子组件
-            this.#addPanelItem(opts);
+            this.#addDropdownItem(opts);
             return this;
         }
 
@@ -290,22 +295,22 @@
 
             //给下拉项添加事件委托
             $(panel.getTarget()).on("click", "[data-comp-role~=body]>[data-comp-role~=list-item]", function () {
-                let listitem = $(this).asComp();//下拉列表项组件
-                let lopts = listitem.getOptions();
+                let li = $(this).asComp();//下拉列表项组件
+                let lopts = li.getOptions();
                 let data = lopts.data;//下拉列表项中的数据
 
                 if (opts.mulitiple === true) {//多选，特点：可以切换选中状态
                     $(this).toggleClass("selected");
 
                     //一次性设置值
-                    let val = [];
+                    let vals = [];
                     let $items = $(panel.getTarget()).find("[data-comp-role~=body]>[data-comp-role~=list-item].selected")
                     $items.each(function () {
                         let o = $(this).asComp().getOptions();
-                        val.push(o.data.value);
+                        vals.push(o.data.value);
                     });
 
-                    me.setValue(val);//以一个数组设置为值
+                    me.setValue(vals);//以一个数组设置为值
                 } else {//单选
                     me.setValue(data.value);
                     $(me.getPanel()).dialog("close");
@@ -319,28 +324,12 @@
     uix.ComboBox = ComboBox;
 
     $.fn.combobox = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.combobox.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).combo(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "combobox", options);
-
-            //每次会重建对象，重建对象时，会融合扩展之前的配置
-            let elem = new ComboBox(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, ComboBox, options, ...params);
     };
 
     //所有方法
     $.fn.combobox.methods = {
-        setData: ($jq, ...params) => uix.each($jq, t => t.setData(...params))
+        data: ($jq, ...params) => uix.each($jq, t => t.setData(...params))
     };
 
     $.fn.combobox.defaults = $.extend(true, {}, $.fn.combo.defaults, {
@@ -350,4 +339,22 @@
         mulitiple: false,//是否支持多选
         //onChange: function (val, old) { }//当值改变时触发事件
     });
+
+
+    //比较两个数组是否相等，数组中的元素限定只能是整数或字符串，本方法会过滤重复元素
+    function equals(a, b) {
+        if (!uix.isArray(a) || !uix.isArray(b)) {
+            return a === b;
+        }
+        let as = new Set(a);
+        let bs = new Set(b);
+
+        if (as.length !== bs.length) {
+            return false;
+        }
+
+        as = [...as].sort();
+        bs = [...bs].sort();
+        return JSON.stringify(as) === JSON.stringify(bs);
+    }
 })(jQuery);

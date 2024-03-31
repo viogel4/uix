@@ -3,18 +3,20 @@
      * 表单组件：下拉框，用于其它组件继承的基础类型
      */
     class Combo extends uix.TextBox {
+        static #DEFAULT_ORDER = 1000;
+
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = ["-ofh", "ofv"]; //初始类名称
         static initialOptions = {
-            inBody: {
+            inbody: {
                 act: "set",
                 compType: "spirit",
                 target: "[data-comp-role~=body]",
                 opts: {
                     body: {
                         act: "set",
-                        elem: "<input type='text' class='uix-input-facade'>",
+                        elem: "<input type='text' class='uix-input-display'>",
                         target: "[data-comp-role~=body]",
                         compType: "element",
                         opts: {
@@ -28,7 +30,7 @@
                         compType: "button",
                         compRole: "dropdown-switch",//下拉开关
                         opts: {
-                            startIcon: "ico ico-20 iconify-arrow-fill-down",
+                            icon: "ico ico-20 iconify-arrow-fill-down",
                             cssClass: "closed",
                             onClick: function (e) {
                                 let $btn = $(this.getTarget());
@@ -49,7 +51,7 @@
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: Combo.initialCssClass,
                 cssStyle: Combo.initialCssStyle
             }, Combo.initialOptions, opts);
@@ -58,12 +60,12 @@
             options = this.getOptions();
 
             //添加下拉面板组件
-            options.layout.items.push(uix.handleOptions({
+            options.layout.items.push(uix.options({
                 act: "set",
                 target: "[data-comp-role~=dropdown-panel]",
                 compType: "dialog",
                 compRole: "dropdown-panel",
-                order: uix.Panel.DEFAULT_ORDER + 10,
+                order: Combo.#DEFAULT_ORDER + 10,
                 opts: {
                     onBeforeOpen: function () {
                         let combo = uix.compById($(this.getTarget()).data("comp-for"));
@@ -73,11 +75,11 @@
                         }
 
                         $(combo.getTarget()).find("[data-comp-role~=dropdown-switch]").removeClass("closed");
-                        let panel = $(combo.getPanel()).asComp();//下拉面板组件
+                        let panel = $(combo.getPanel()).asComp();//下拉面板组件，实际上是一个dialog实例
 
                         //组件高度和宽度
                         let h = $(combo.getTarget()).outerHeight();
-                        let w = $(combo.getTarget()).find(":input.uix-input-facade").parent().outerWidth();//内部面板宽度
+                        let w = $(combo.getTarget()).find(":input.uix-input-display").parent().outerWidth();//内部面板宽度
                         let offset = $(combo.getTarget()).offset();//组件偏移（相对于视区）
                         let ctop = offset.top;//组件上偏移
 
@@ -130,11 +132,11 @@
                         right: "0px",
                         width: options.panelWidth || "",
                         height: options.panelHeight || "",
-                        "min-width": options.minPanelWidth || "",
-                        "min-height": options.minPanelHeight || ""
+                        minWidth: options.minPanelWidth || "",
+                        minHeight: options.minPanelHeight || ""
                     },
-                    header: $.isPlainObject(options.panelHeader) ? options.panelHeader : (options.panelHeader ? {} : false),
-                    footer: $.isPlainObject(options.panelFooter) ? options.panelFooter : (options.panelFooter ? {} : false)
+                    header: uix.isObject(options.panelHeader) ? options.panelHeader : (options.panelHeader ? {} : false),
+                    footer: uix.isObject(options.panelFooter) ? options.panelFooter : (options.panelFooter ? {} : false)
                 }
             }, {
                 opts: {
@@ -145,10 +147,6 @@
             }));
 
             /////////////////
-        }
-
-        getCompType() {
-            return "combo";
         }
 
         /**
@@ -166,14 +164,13 @@
         //如有必要，重写父类方法
         render() {
             let opts = this.getOptions();
-
             super.render();
 
             //下拉面板dom，实际上为对话框
             $(this.getPanel()).attr("data-comp-for", opts.id);
 
             //如果没有指定宽度，则与表单元素同宽（去除label）
-            let $inbody = $(this.getTarget()).find(":input.uix-input-facade").parent();
+            let $inbody = $(this.getTarget()).find(":input.uix-input-display").parent();
             let w = $inbody.outerWidth();
 
             if (uix.isNotValid(opts.panelWidth)) {
@@ -232,23 +229,7 @@
     uix.Combo = Combo;
 
     $.fn.combo = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.combo.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).textbox(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "combo", options);
-
-            //每次会重建对象，重建对象时，会融合扩展之前的配置
-            let elem = new Combo(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, Combo, options, ...params);
     };
 
     //所有方法

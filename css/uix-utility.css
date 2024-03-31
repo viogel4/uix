@@ -954,3 +954,8 @@ ul.no-style {
 .tsf-r90 {
 	transform: rotate(90deg);
 }
+
+/* 正常字体 */
+.fsn {
+	font-style: normal;
+}
