@@ -123,6 +123,11 @@
                         let combo = uix.compById($(this.getTarget()).data("comp-for"));
                         $(combo.getTarget()).find("[data-comp-role~=dropdown-switch]").addClass("closed");
                         return true;
+                    },
+                    body: {
+                        opts: {
+                            cssClass: "ofa-y"
+                        }
                     }
                 }
             }, {

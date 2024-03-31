@@ -46,73 +46,81 @@
 				cssStyle: Window.initialCssStyle
 			}, Window.initialOptions, opts);
 
-			//窗口标题栏右侧按钮
-			let order = Window.#DEFAULT_ORDER;//弹性子元素顺序号
-			let headerTools = uix.applyKey(options, "header.opts.endIcons", []);
-			let tools = {
-				collapse: "collapsible",
-				max: "maximizable",
-				min: "minimizable",
-				close: "closable"
-			};
 
-			for (let key in tools) {
-				let cfg = tools[key];
-				if (options[cfg] === false) {
-					headerTools.push({
-						act: "remove",
-						target: "[data-comp-role~=" + key + "]"
-					});
-				} else {
-					order += 10;
-					let btn = {
-						act: "set",
-						elem: "<a>",
-						target: "[data-comp-role~=" + key + "]",
-						compType: "button",
-						compRole: "ei " + key,
-						order,
-						opts: {
-							icon: "iconify-window-" + key,
-							cssClass: "wbtn",
-							handler: function (e) {
-								let win = uix.closestWindow(e.currentTarget);//向上找，最近的Window组件
-								let handler = win.getOptions()[key + "Handler"];
-								if (uix.isFunc(handler)) {
-									handler.call(this, win, e);
+			//窗口可以没有头部
+			//当前提是header不为false且不是用户自定义对象时
+			if (options.header !== false && !uix.isObject(options.header)) {
+				//窗口标题栏右侧按钮
+				let order = Window.#DEFAULT_ORDER;//弹性子元素顺序号
+				let headerTools = uix.applyKey(options, "header.opts.endIcons", []);
+				let tools = {
+					collapse: "collapsible",
+					max: "maximizable",
+					min: "minimizable",
+					close: "closable"
+				};
+
+				for (let key in tools) {
+					let cfg = tools[key];
+					if (options[cfg] === false) {
+						headerTools.push({
+							act: "remove",
+							target: "[data-comp-role~=" + key + "]"
+						});
+					} else {
+						order += 10;
+						let btn = {
+							act: "set",
+							elem: "<a>",
+							target: "[data-comp-role~=" + key + "]",
+							compType: "button",
+							compRole: "ei " + key,
+							order,
+							opts: {
+								icon: "iconify-window-" + key,
+								cssClass: "wbtn",
+								handler: function (e) {
+									let win = uix.closestWindow(e.currentTarget);//向上找，最近的Window组件
+									let handler = win.getOptions()[key + "Handler"];
+									if (uix.isFunc(handler)) {
+										handler.call(this, win, e);
+									}
 								}
 							}
-						}
-					};
-					headerTools.push(btn);
+						};
+						headerTools.push(btn);
+					}
 				}
 			}
 
-
 			//追加自定义头部工具栏
-			if (uix.isArray(options.headerTools) && options.headerTools.length > 0) {
+			let headerTools = uix.valueByKey(options, "header.opts.endIcons");
+			if (uix.isArray(headerTools) && uix.isArray(options.headerTools)) {
 				options.headerTools.forEach(it => headerTools.push(it));
 			}
 
-			//自定义脚部工具栏，窗口组件默认没有脚部工具栏，dialog组件默认有脚部工具栏
-			if (uix.isArray(options.footerTools) && options.footerTools.length > 0) {
-				let footerTools = uix.applyKey(options, "footer.opts.endIcons", []);
-				options.footerTools.forEach(it => footerTools.push(it));
 
-				let footer = uix.options({
-					act: "set",
-					target: "[data-comp-role~=footer]",
-					order: Window.#DEFAULT_ORDER + 10,
-					compType: "spirit",
-					compRole: "footer",
-					opts: {
-						cssClass: ["fgw-0", "fsk-0", "w-100", "p-1", "border-top-collapse", "bg-light"],
-						bordered: "btd"
-					}
-				}, options.footer);
+			//窗口可以没有尾部
+			if (options.footer !== false && !uix.isObject(options.footer)) {//如果有自定义footer，则以自定义的为准
+				//自定义脚部工具栏，窗口组件默认没有脚部工具栏，dialog组件默认有脚部工具栏
+				if (uix.isArray(options.footerTools)) {
+					let footerTools = uix.applyKey(options, "footer.opts.endIcons", []);
+					options.footerTools.forEach(it => footerTools.push(it));
 
-				options.footer = footer;
-				//
+					let footer = uix.options({
+						act: "set",
+						target: "[data-comp-role~=footer]",
+						order: Window.#DEFAULT_ORDER + 10,
+						compType: "spirit",
+						compRole: "footer",
+						opts: {
+							cssClass: ["fgw-0", "fsk-0", "w-100", "p-1", "border-top-collapse", "bg-light"],
+							bordered: "btd"
+						}
+					}, options.footer);
+
+					options.footer = footer;
+				}
 			}
 
 			super(domSrc, options);
@@ -172,7 +180,7 @@
 			}
 
 			//添加拖拽能力，多次执行不会重复添加
-			if (opts.draggable !== false) {
+			if (opts.draggable !== false && this.getHeader()) {
 				let dopts = {
 					handle: "[data-comp-role~=header]",
 					excluded: "[data-comp-role~=ei]",
@@ -230,9 +238,12 @@
 
 		//设置头部按钮的icon
 		setHeaderBtnIcon(role, icon) {
-			let btn = this.getHeader().childrenByRole(role);//获取头部按钮组件
-			if (uix.isArray(btn) && btn.length > 0) {
-				btn[0].setIcon(icon);
+			let header = this.getHeader();
+			if (header) {
+				let btn = this.getHeader().childrenByRole(role);//获取头部按钮组件
+				if (uix.isArray(btn) && btn.length > 0) {
+					btn[0].setIcon(icon);
+				}
 			}
 		}
 

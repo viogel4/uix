@@ -39,11 +39,8 @@ todo:
 
 
 47.scrollpane组件，未完成，有很多todo。
-48.combobox组件未检查完。下拉面板如何不显示header。
+48.combobox组件未检查完。
 
-
-49.window组件，需要兼容Card的header、body、footer配置项，允许没有header，body,footer，也可以自定义设置。
-解决header、body和footer通过选项是否显示的问题。
 
 
 

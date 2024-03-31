@@ -220,7 +220,7 @@
             if (uix.isValid(value)) {//如果表单已有值，在更新data之后，重新设置值
                 this.setValue(value);//重新设置值，是因为重新更新data之后，下拉项内容已经改变
             }
-            
+
             return this;
         }
 
@@ -274,7 +274,7 @@
         //清除所有下拉项
         clearItems() {
             let panel = $(this.getPanel()).asComp();
-            $(panel.getBody()).children().element("destroy");
+            $(panel.getBody().getTarget()).children().element("destroy");
             return this;
         }
 
@@ -335,7 +335,7 @@
     $.fn.combobox.defaults = $.extend(true, {}, $.fn.combo.defaults, {
         readonly: true,//默认只读，不允许通过键入修改内容
         showByInnerClick: true,//点击表单元素内部是否弹出下拉面板，如果editable为true，则此配置项失效
-        panelHeader: false,//下拉面板默认无头部
+        panelHeader: false,//下拉面板默认无头部标题栏
         mulitiple: false,//是否支持多选
         //onChange: function (val, old) { }//当值改变时触发事件
     });
