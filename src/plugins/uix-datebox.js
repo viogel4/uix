@@ -3,17 +3,18 @@
      * 表单组件：日期选择框
      */
     class DateBox extends uix.Combo {
+        static #DEFAULT_ORDER = 1000;
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
-        static initialOptions = {//全局默认配置
+        static initialOptions = {//全局初始配置
             parser: (it, pattern = "yyyy-MM-dd") => uix.parseDateTime(it, pattern),
             formatter: (it, pattern = "yyyy-MM-dd") => uix.formatDateTime(it, pattern),
-            inBody: {
+            inbody: {
                 opts: {
                     endIcons: [{
-                        opts: {
-                            startIcon: "ico ico-20 iconify-calendar"
+                        opts: {//combo的下拉按钮组件
+                            icon: "ico ico-20 iconify-calendar"
                         }
                     }]
                 }
@@ -21,7 +22,7 @@
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: DateBox.initialCssClass,
                 cssStyle: DateBox.initialCssStyle
             }, DateBox.initialOptions, opts);
@@ -31,7 +32,18 @@
             options = this.getOptions();
 
             //一个combo组件只有一个下拉面板
-            let dropdown = options.layout.items.find(it => uix.matchRoles("dropdown-panel", uix.getItemRoles(it)));
+            let dropdown = options.layout.items.find(it => {
+                let roles = [];
+                if (it.compRole) {
+                    roles = roles.concat(it.compRole.split(/\s+/));//角色可以使用空格进行分隔
+                }
+                let r = uix.applyKey(it, "opts.role", "");
+                if (r) {
+                    roles = roles.concat(r.split(/\s+/));
+                }
+                return roles.includes("dropdown-panel");
+            });
+
             let oldFn = dropdown.opts.onBeforeOpen;
             let me = this;
 
@@ -46,9 +58,9 @@
                 }
 
                 //创建(绘制)一个日历对象
-                me.drawCalendar(body, date);
+                me.drawCalendar(body.getTarget(), date);
 
-                if ($.isFunction(oldFn)) {
+                if (uix.isFunc(oldFn)) {
                     return oldFn.call(this, dom);
                 }
                 return true;
@@ -57,17 +69,13 @@
             ////////////////////
         }
 
-        getCompType() {
-            return "datebox";
-        }
-
         //格式化日期
         format(date) {
             let opts = this.getOptions();
-            return $.isFunction(opts.formatter) ? opts.formatter(date, "yyyy-MM-dd") : uix.formatDateTime(date, "yyyy-MM-dd")
+            return uix.isFunc(opts.formatter) ? opts.formatter(date, "yyyy-MM-dd") : uix.formatDateTime(date, "yyyy-MM-dd")
         }
 
-        //绘制日历
+        //绘制日历组件，第一个参数为绘制目标元素，第二个参数为默认选中日期
         drawCalendar(dom, date) {
             let me = this;
             //let opts = this.getOptions();//当前datebox组件配置项
@@ -79,7 +87,7 @@
                 compType: "calendar",
                 compRole: "body",
                 target: "[data-comp-role~=body]",
-                order: uix.Panel.DEFAULT_ORDER - 10,
+                order: DateBox.#DEFAULT_ORDER - 10,
                 opts: {
                     date,
                     cssClass: "-border-default bbd",
@@ -97,7 +105,7 @@
                 compType: "inline",
                 compRole: "footer",
                 target: "[data-comp-role~=footer]",
-                order: uix.Panel.DEFAULT_ORDER + 10,
+                order: DateBox.#DEFAULT_ORDER + 10,
                 opts: {
                     items: [{
                         act: "set",
@@ -115,10 +123,10 @@
                             cssClass: "btn btn-sm btn-default",
                             onClick: function () {
                                 me.setValue("");//设置表单值为空
-                                let body = calendar.find("[data-comp-role=body]");//日期显示面板
+                                let body = calendar.find("[data-comp-role~=body]");//日期显示面板
                                 let now = new Date();
                                 calendar.showDayPanel(body, now);
-                                footer.find("[data-comp-role=preview]").text(me.format(now));
+                                footer.find("[data-comp-role~=preview]").text(me.format(now));
                             }
                         }
                     }, {
@@ -155,23 +163,7 @@
     uix.DateBox = DateBox;
 
     $.fn.datebox = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.datebox.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).combo(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "datebox", options);
-
-            //每次会重建对象，重建对象时，会融合扩展之前的配置
-            let elem = new DateBox(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, DateBox, options, ...params);
     };
 
     //所有方法

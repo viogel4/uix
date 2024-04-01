@@ -109,18 +109,18 @@
 			}
 
 			//设置卡片图标icon
-			if (uix.isValid(opts.icon)) {
+			if (opts.icon) {
 				this.setIcon(opts.icon);
 			}
 
-			//设置卡片标题
-			if (uix.isValid(opts.title)) {
-				console.log(opts.title);
+			//设置卡片标题，支持空字符串标题
+			if (uix.isString(opts.title)) {
 				this.setTitle(opts.title);
 			}
 			/////
 		}
 
+		//设置标题栏的icon
 		setIcon(icon) {
 			//卡片头部，icon和title都是设置到header组件上，组件类型spirit。
 			let header = this.getHeader();
@@ -146,12 +146,11 @@
 			return this;
 		}
 
+		//设置标题。支持设置空字符标题
 		setTitle(title) {
-			let header = this.getHeader();
-			console.log(header);
+			let header = this.getHeader();//header默认是一个Spirit组件
 
-
-			if (header) {
+			if (uix.isTypeOf(header, "Spirit")) {
 				let body = header.getBody();//返回body组件
 				if (body) {
 					$(body.getTarget()).text(title);

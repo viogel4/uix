@@ -232,6 +232,22 @@
 		});
 	};
 
+	//断言某个对象obj是否某个指定的类型，types为不定长参数
+	uix.isTypeOf = (obj, ...types) => {
+		return types.some(it => {
+			if (uix.isString(it)) {
+				let t = uix[it];
+				if (t) {
+					return obj instanceof t;
+				} else {
+					return obj instanceof window[it];
+				}
+			} else {
+				return obj instanceof it;
+			}
+		});
+	};
+
 	//弹出一个极简面板显示信息
 	uix.info = function (message, timeout = 1200) {
 		let $dom = $("<div class='dpn messager'>").html(message).appendTo(document.body);

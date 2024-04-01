@@ -3,17 +3,20 @@
      * 分页条组件
      */
     class Pagination extends uix.Inline {
+        static #DEFAULT_ORDER = 1000;
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = ["aic", "-ofh", "ofv"]; //初始类名称
         static initialOptions = {//初始默认配置
             navigatePages: 5,//默认导航总页数
-            items: [],
+            items: [],//每一个页码组件，动态的
+            //页码改变事件
             onPageNoChange: async function (pageNo, pageSize) {
                 let datagrid = uix.closestComp(this.getTarget(), "DataGrid");//datagrid组件
                 if (datagrid) {
-                    let loader = datagrid.getOptions().loader;//数据载入器
-                    if ($.isFunction(loader)) {
+                    //数据载入器函数
+                    let loader = datagrid.getOptions().loader;
+                    if (uix.isFunc(loader)) {
                         try {
                             //向后台服务器查询数据
                             let resp = await loader.call(datagrid, pageNo || this.getPageNo(), pageSize || this.getPageSize());
@@ -24,10 +27,10 @@
                                 }
 
                                 if (uix.isArray(resp.data)) {
-                                    datagrid.setData(resp.data);
+                                    datagrid.setData(resp.data);//给表格组件设置数据
                                 }
 
-                                //一次性设置多个分页信息，可为空，为空则不设置
+                                //一次性设置多项分页信息，各项数据可为空，为空时单项不进行设置
                                 this.setPaginateInfo({
                                     pageNo: resp.pageNo,
                                     pageSize: resp.pageSize,
@@ -40,25 +43,27 @@
                     }
                 }
             },
+            //页码大小改变事件
             onPageSizeChange: function (pageSize) {
                 let opts = this.getOptions();
-                if ($.isFunction(opts.onPageNoChange)) {
-                    opts.onPageNoChange.call(this, this.getPageNo(), pageSize);
+                if (uix.isFunc(opts.onPageNoChange)) {
+                    opts.onPageNoChange.call(this, this.getPageNo(), pageSize || this.getPageSize());
                 }
             }
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: Pagination.initialCssClass,
                 cssStyle: Pagination.initialCssStyle
             }, Pagination.initialOptions, opts);
 
             //各内联组件项
             let items = options.items;
+
             //显示总记录数
             if (options.showTotal !== false) {
-                if ($.isPlainObject(options.showTotal)) {
+                if (uix.isObject(options.showTotal)) {
                     options.showTotal.comRole = (options.showTotal.comRole || "") + " total";
                     items.push(options.showTotal);
                 } else {
@@ -67,7 +72,7 @@
                         target: "[data-comp-role~=total]",
                         compType: "element",
                         compRole: "total",
-                        order: uix.Panel.DEFAULT_ORDER,
+                        order: Pagination.#DEFAULT_ORDER,
                         opts: {
                             content: "共<i class='total'>0</i>条/共<i class='pages'>0</i>页",
                             cssClass: "mr-2"
@@ -78,7 +83,7 @@
 
             //显示首页
             if (options.showFirst !== false) {
-                if ($.isPlainObject(options.showFirst)) {
+                if (uix.isObject(options.showFirst)) {
                     items.push(options.showFirst);
                 } else {
                     items.push({
@@ -86,9 +91,9 @@
                         target: "[data-comp-role~=first]",
                         compType: "button",
                         compRole: "first",
-                        order: uix.Panel.DEFAULT_ORDER + 10,
+                        order: Pagination.#DEFAULT_ORDER + 10,
                         opts: {
-                            buttonText: typeof options.showFirst === "string" ? options.showFirst : "首页",
+                            buttonText: uix.isString(options.showFirst) ? options.showFirst : "首页",
                             cssClass: "btn btn-default",
                             onClick: function () {
                                 let pagination = uix.closestComp(this.getTarget(), "Pagination");
@@ -101,7 +106,7 @@
 
             //显示尾页
             if (options.showLast !== false) {
-                if ($.isPlainObject(options.showLast)) {
+                if (uix.isObject(options.showLast)) {
                     items.push(options.showLast);
                 } else {
                     items.push({
@@ -109,9 +114,9 @@
                         target: "[data-comp-role~=last]",
                         compType: "button",
                         compRole: "last",
-                        order: uix.Panel.DEFAULT_ORDER + 50,
+                        order: Pagination.#DEFAULT_ORDER + 50,
                         opts: {
-                            buttonText: typeof options.showLast === "string" ? options.showLast : "尾页",
+                            buttonText: uix.isString(options.showLast) ? options.showLast : "尾页",
                             cssClass: "btn btn-default",
                             onClick: function () {
                                 let pagination = uix.closestComp(this.getTarget(), "Pagination");
@@ -124,7 +129,7 @@
 
             //显示上一页
             if (options.showPrev !== false) {
-                if ($.isPlainObject(options.showPrev)) {
+                if (uix.isObject(options.showPrev)) {
                     items.push(options.showPrev);
                 } else {
                     items.push({
@@ -132,9 +137,9 @@
                         target: "[data-comp-role~=prev]",
                         compType: "button",
                         compRole: "prev",
-                        order: uix.Panel.DEFAULT_ORDER + 20,
+                        order: Pagination.#DEFAULT_ORDER + 20,
                         opts: {
-                            buttonText: typeof options.showPrev === "string" ? options.showPrev : "上一页",
+                            buttonText: uix.isString(options.showPrev) ? options.showPrev : "上一页",
                             cssClass: "btn btn-default",
                             onClick: function () {
                                 let pagination = uix.closestComp(this.getTarget(), "Pagination");
@@ -147,7 +152,7 @@
 
             //显示下一页
             if (options.showNext !== false) {
-                if ($.isPlainObject(options.showNext)) {
+                if (uix.isObject(options.showNext)) {
                     items.push(options.showNext);
                 } else {
                     items.push({
@@ -155,9 +160,9 @@
                         target: "[data-comp-role~=next]",
                         compType: "button",
                         compRole: "next",
-                        order: uix.Panel.DEFAULT_ORDER + 40,
+                        order: Pagination.#DEFAULT_ORDER + 40,
                         opts: {
-                            buttonText: typeof options.showNext === "string" ? options.showNext : "下一页",
+                            buttonText: uix.isString(options.showNext) ? options.showNext : "下一页",
                             cssClass: "btn btn-default",
                             onClick: function () {
                                 let pagination = uix.closestComp(this.getTarget(), "Pagination");
@@ -170,7 +175,7 @@
 
             //显示刷新按钮
             if (options.showReload !== false) {
-                if ($.isPlainObject(options.showReload)) {
+                if (uix.isObject(options.showReload)) {
                     items.push(options.showReload);
                 } else {
                     items.push({
@@ -178,7 +183,7 @@
                         target: "[data-comp-role~=reload]",
                         compType: "button",
                         compRole: "reload",
-                        order: uix.Panel.DEFAULT_ORDER + 70,
+                        order: Pagination.#DEFAULT_ORDER + 70,
                         opts: {
                             icon: "ico ico-16 iconify-reload",
                             cssClass: "ml-2",
@@ -193,7 +198,7 @@
 
             //显示跳转到第几页
             if (options.showGoto !== false) {
-                if ($.isPlainObject(options.showGoto)) {
+                if (uix.isObject(options.showGoto)) {
                     items.push(options.showGoto);
                 } else {
                     items.push({
@@ -201,7 +206,7 @@
                         target: "[data-comp-role~=goto]",
                         compType: "textbox",
                         compRole: "goto",
-                        order: uix.Panel.DEFAULT_ORDER + 80,
+                        order: Pagination.#DEFAULT_ORDER + 80,
                         opts: {
                             label: true,
                             labelText: "到第&nbsp;",
@@ -224,7 +229,7 @@
                         target: "[data-comp-role~=submit]",
                         compType: "button",
                         compRole: "submit",
-                        order: uix.Panel.DEFAULT_ORDER + 90,
+                        order: Pagination.#DEFAULT_ORDER + 90,
                         opts: {
                             buttonText: "提交",
                             cssClass: "btn btn-primary ml-2",
@@ -242,7 +247,7 @@
 
             //显示页面大小选择
             if (options.showPageSizes !== false) {
-                if ($.isPlainObject(options.showPageSizes)) {
+                if (uix.isObject(options.showPageSizes)) {
                     items.push(options.showPageSizes);
                 } else {
                     items.push({
@@ -250,7 +255,7 @@
                         target: "[data-comp-role~=page-size]",
                         compType: "combobox",
                         compRole: "page-size",
-                        order: uix.Panel.DEFAULT_ORDER + 60,
+                        order: Pagination.#DEFAULT_ORDER + 60,
                         opts: {
                             panelWidth: "100px",
                             minPanelWidth: "",
@@ -285,9 +290,9 @@
                 }
             }
 
-            //数字页码
+            //各数字页码组件
             if (options.showNumbers !== false) {
-                if ($.isPlainObject(options.showNumbers)) {
+                if (uix.isObject(options.showNumbers)) {
                     items.push(options.showNumbers);
                 } else {
                     items.push({
@@ -295,7 +300,7 @@
                         target: "[data-comp-role~=numbers]",
                         compType: "inline",
                         compRole: "numbers",
-                        order: uix.Panel.DEFAULT_ORDER + 30
+                        order: Pagination.#DEFAULT_ORDER + 30
                     });
                 }
             }
@@ -303,38 +308,36 @@
             super(domSrc, options);
         }
 
-        getCompType() {
-            return "pagination";
-        }
-
         render() {
             let opts = this.getOptions();
             super.render();
 
             let $goto = this.children("[data-comp-role~=goto]");
-            $goto.find(".uix-input-facade").keydown(e => {
+            $goto.find(".uix-input-display").off("keydown.paginate-goto").on("keydown.paginate-goto", (e => {
                 if (e.keyCode === 13) {//回车
                     let target = e.target;
                     this.setPageNo(parseInt($(target).val()), true);//触发事件
                 }
-            });
+            }));
 
-            //设置初始总数
+            //设置初始总记录数
             if (uix.isNumber(opts.total)) {
                 this.setTotal(parseInt(opts.total));
             }
 
+            //设置初始页码数
             if (uix.isNumber(opts.pageNo)) {
                 this.setPageNo(parseInt(opts.pageNo));
             }
 
+            //设置初始页面大小
             if (uix.isNumber(opts.pageSize)) {
                 this.setPageSize(parseInt(opts.pageSize));
             }
         }
 
-        //同时设置多个分页数据，值可为空，为空则不设置
-        setPaginateInfo(pi, triggerEvent = false) {
+        //同时设置多个分页项数据，各项值可为空，为空则不进行设置
+        setPaginateInfo(pi, fire = false) {
             let pageNo = pi.pageNo;
             let pageSize = pi.pageSize;
             let total = pi.total;
@@ -351,7 +354,7 @@
                 this.setPageSize(pageSize);
             }
 
-            if (triggerEvent) {
+            if (fire) {
                 this.setPageNo(this.getPageNo, true);
             }
         }
@@ -363,7 +366,7 @@
         }
 
         //设置当前页码，第2个参数triggerEvent表示是否触发事件
-        setPageNo(pageNo, triggerEvent = false) {
+        setPageNo(pageNo, fire = false) {
             if (pageNo < 1) {
                 pageNo = 1;
             }
@@ -373,9 +376,9 @@
             }
 
             //触发事件
-            if (triggerEvent) {
+            if (fire) {
                 let opts = this.getOptions();
-                if ($.isFunction(opts.onPageNoChange)) {
+                if (uix.isFunc(opts.onPageNoChange)) {
                     opts.onPageNoChange.call(this, pageNo);
                 }
             }
@@ -392,16 +395,16 @@
             return this.#pageSize;
         }
 
-        //设置页面大小，第2个参数triggerEvent表示是否触发事件
-        setPageSize(pageSize, triggerEvent = false) {
+        //设置页面大小，第2个参数fire表示是否触发事件
+        setPageSize(pageSize, fire = false) {
             if (pageSize < 1) {
-                throw new Error("页面大小不能为负数");
+                throw new Error("页面大小不能为小于1的数");
             }
 
             //触发事件
-            if (triggerEvent) {
+            if (fire) {
                 let opts = this.getOptions();
-                if ($.isFunction(opts.onPageSizeChange)) {
+                if (uix.isFunc(opts.onPageSizeChange)) {
                     opts.onPageSizeChange.call(this, pageSize);
                 }
             }
@@ -453,12 +456,14 @@
 
             //数字页码设置最后一页
             this.#handleNumbers();
+
+            return this;
         }
 
         //处理数字页码
         #handleNumbers() {
             let opts = this.getOptions();
-            let count = opts.navigatePages || 5;
+            let count = opts.navigatePages || 5;//导航总页数
             let half = parseInt(count / 2);
             let pageNo = this.getPageNo();//当前页
             let pages = this.getPages();//总页数
@@ -477,10 +482,10 @@
             }
 
             let numbers = this.children("[data-comp-role~=numbers]");
-            numbers.children().button("destroy");//销毁所有子组件
+            numbers.children().button("destroy");//销毁所有数字页码子组件
 
             for (let i = navFirst; i <= navLast; i++) {
-                $(numbers).inline("setItem", {
+                $(numbers).inline("makeItem", {
                     act: "set",
                     target: "[data-comp-role~=number-" + i + "]",
                     compType: "button",
@@ -497,7 +502,7 @@
             }
 
             if (pages > navLast) {//再添加个省略号和尾页
-                $(numbers).inline("setItem", {
+                $(numbers).inline("makeItem", {
                     act: "set",
                     target: "[data-comp-role~=number-x]",
                     compType: "button",
@@ -508,7 +513,7 @@
                     }
                 });
 
-                $(numbers).inline("setItem", {
+                $(numbers).inline("makeItem", {
                     act: "set",
                     target: "[data-comp-role~=number-last]",
                     compType: "button",
@@ -538,21 +543,7 @@
     uix.Pagination = Pagination;
 
     $.fn.pagination = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.pagination.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).inline(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "pagination", options);
-            let elem = new Pagination(this, opts);
-            elem.render();
-        });
+        return uix.make(this, Pagination, options, ...params);
     };
 
     //所有方法

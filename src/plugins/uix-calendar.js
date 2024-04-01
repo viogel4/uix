@@ -8,6 +8,7 @@
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
         static initialOptions = {//全局初始配置
+            title: false,
             header: {
                 act: "set",
                 elem: "[data-comp-role=header]",
@@ -88,13 +89,13 @@
             let opts = this.getOptions();
             super.render();
 
-            //日历主体面板部分
+            //获取日历主体面板组件
             let body = this.getBody();
             //let range = opts.range === true;//显示区间显示
 
             if (opts.mode === "day") {//显示日期，最常用
                 let order = Calendar.#DEFAULT_ORDER;
-                let panel = $(body).asComp().makeItem({
+                let panel = body.makeItem({
                     order: order++
                 });
 
@@ -146,7 +147,7 @@
             let year = date.getFullYear();
             let month = date.getMonth() + 1;
 
-            let header = this.getHeader().asComp();
+            let header = this.getHeader();//头部组件
             header.find("[data-comp-role=current-year]>i").text(year);//当前展示年份
             header.find("[data-comp-role=current-month]>i").text(month);//当前展示月份
 
