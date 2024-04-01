@@ -115,6 +115,7 @@
 
 			//设置卡片标题
 			if (uix.isValid(opts.title)) {
+				console.log(opts.title);
 				this.setTitle(opts.title);
 			}
 			/////
@@ -147,6 +148,9 @@
 
 		setTitle(title) {
 			let header = this.getHeader();
+			console.log(header);
+
+
 			if (header) {
 				let body = header.getBody();//返回body组件
 				if (body) {

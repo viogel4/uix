@@ -121,7 +121,7 @@
 			return this.addEndIcon(icon);
 		}
 
-		//返回主体部分组件，仅允许有一个主体
+		//返回主体组件，仅允许有一个主体
 		getBody() {
 			let bodies = super.childrenByRole("body");
 			return bodies.length > 0 ? bodies[0] : null;

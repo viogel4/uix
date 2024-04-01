@@ -3,53 +3,54 @@
      * 表单组件：日历，可用于选择日期和时间
      */
     class Calendar extends uix.Card {
+        static #DEFAULT_ORDER = 1000;
         //静态变量
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
-        static initialOptions = {//全局默认配置
+        static initialOptions = {//全局初始配置
             header: {
                 act: "set",
                 elem: "[data-comp-role=header]",
                 compType: "inline",
                 compRole: "header",
-                order: uix.Panel.DEFAULT_ORDER - 10,
+                order: Calendar.#DEFAULT_ORDER - 10,
                 opts: {
                     cssClass: "text-grey",
                     items: [{
                         act: "set",
                         compType: "element",
                         compRole: "prev-year",
-                        order: uix.Panel.DEFAULT_ORDER - 30,
+                        order: Calendar.#DEFAULT_ORDER - 30,
                         opts: { cssClass: "ico ico-20 iconify-arrow-double-left csr-p" }
                     }, {
                         act: "set",
                         compType: "element",
                         compRole: "prev-month",
-                        order: uix.Panel.DEFAULT_ORDER - 20,
+                        order: Calendar.#DEFAULT_ORDER - 20,
                         opts: { cssClass: "ico ico-20 iconify-arrow-single-left ml-2 csr-p" }
                     }, {
                         act: "set",
                         compType: "element",
                         compRole: "current-year",
-                        order: uix.Panel.DEFAULT_ORDER - 10,
+                        order: Calendar.#DEFAULT_ORDER - 10,
                         opts: { content: "<i></i>&nbsp;年", cssClass: "fgw-1 tar mr-2 csr-p" }
                     }, {
                         act: "set",
                         compType: "element",
                         compRole: "current-month",
-                        order: uix.Panel.DEFAULT_ORDER + 10,
+                        order: Calendar.#DEFAULT_ORDER + 10,
                         opts: { content: "<i></i>&nbsp;月", cssClass: "fgw-1 tal ml-2 csr-p" }
                     }, {
                         act: "set",
                         compType: "element",
                         compRole: "next-month",
-                        order: uix.Panel.DEFAULT_ORDER + 20,
+                        order: Calendar.#DEFAULT_ORDER + 20,
                         opts: { cssClass: "ico ico-20 iconify-arrow-single-right mr-2 csr-p" }
                     }, {
                         act: "set",
                         compType: "element",
                         compRole: "next-year",
-                        order: uix.Panel.DEFAULT_ORDER + 30,
+                        order: Calendar.#DEFAULT_ORDER + 30,
                         opts: { cssClass: "ico ico-20 iconify-arrow-double-right csr-p" }
                     }]
                 }
@@ -59,7 +60,7 @@
                 elem: "[data-comp-role=body]",
                 compType: "panel",
                 compRole: "body",
-                order: uix.Panel.DEFAULT_ORDER,
+                order: Calendar.#DEFAULT_ORDER,
                 opts: {
                     layout: {
                         type: "row"
@@ -73,7 +74,7 @@
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: Calendar.initialCssClass,
                 cssStyle: Calendar.initialCssStyle
             }, Calendar.initialOptions, opts);
@@ -83,12 +84,7 @@
             ////////////////////
         }
 
-        getCompType() {
-            return "calendar";
-        }
-
         render() {
-            let me = this;
             let opts = this.getOptions();
             super.render();
 
@@ -97,13 +93,13 @@
             //let range = opts.range === true;//显示区间显示
 
             if (opts.mode === "day") {//显示日期，最常用
-                let order = uix.Panel.DEFAULT_ORDER;
+                let order = Calendar.#DEFAULT_ORDER;
                 let panel = $(body).asComp().makeItem({
                     order: order++
                 });
 
                 let date = opts.date || new Date();
-                this.showDayPanel(panel.getTarget(), date, opts);
+                this.showDayPanel(panel.getTarget(), date, opts);//显示日期面板
             }
         }
 
@@ -117,7 +113,7 @@
             if (enabled) {//添加事件监听
                 $(body).on("click.calendar-daycell", ".calendar-body tr>td", function () {
                     let $daycell = $(this);
-                    if ($.isFunction(opts.onDayCellClick)) {
+                    if (uix.isFunc(opts.onDayCellClick)) {
                         let ymd = $daycell.data("ymd");
                         let _ = ymd.split("-");
                         let date = new Date(parseInt(_[0]), parseInt(_[1]) - 1, parseInt(_[2]));
@@ -142,7 +138,7 @@
 
         //显示日期选择面板
         showDayPanel(dom, date = new Date(), opts = {}) {
-            if (!(date instanceof Date) && $.isPlainObject(date)) {
+            if (!(date instanceof Date) && uix.isObject(date)) {
                 opts = date;
                 date = new Date();
             }
@@ -185,7 +181,7 @@
                     }
 
                     let actual = dayCell;
-                    if ($.isFunction(opts.dayRenderFormatter)) {
+                    if (uix.isFunc(opts.dayRenderFormatter)) {
                         //actual = opts.dayRenderFormatter.call(this, dayCell,);
                     }
 
@@ -228,23 +224,7 @@
     uix.Calendar = Calendar;
 
     $.fn.calendar = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.calendar.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).card(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "calendar", options);
-
-            //每次会重建对象，重建对象时，会融合扩展之前的配置
-            let elem = new Calendar(this, opts);
-            elem.render(); //手动执行渲染
-        });
+        return uix.make(this, Calendar, options, ...params);
     };
 
     //所有方法
@@ -257,7 +237,7 @@
         //支持：day-day,month-month,year-year,time-time,daytime-daytime，双面板区间范围，若联合range属性，可省略重复写法
         //支持：year-month,day-time双面板展示
         mode: "day",//day:显示日期，month:显示月份，year:显示年份，time:显示时间，daytime:日期时间同时显示
-        range: false,//值为true，则表示显示区间
+        range: false,//当值为true，则表示显示日期区间
         //dayRenderFormatter: (d, m, y) => d,//显示日期时的格式化函数，可用于特殊日期特殊样式，特殊显示，如标注等功能
         //onDayCellClick: null,//点击日期单元格时触发的事件
         //date: new Date(),//日历默认显示的当前日期
