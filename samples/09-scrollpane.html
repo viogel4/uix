@@ -27,38 +27,45 @@
     <script src="../src/plugins/uix-button.js"></script>
     <script src="../src/plugins/uix-scrollpane.js"></script>
 
+    <style>
+        [data-comp-role~=container]>div {
+            margin-right: 10px;
+            width: 80px;
+        }
+    </style>
+
     <script>
         $(function () {
-            $("#a1").scrollpane({
+           /*  $("#a1").scrollpane({
                 bordered: true
-            });
+            }); */
 
             $("#a1").scrollpane({
                 bordered: true,
-                alwaysShowActBtn: true
+                alwaysShowBtns: true
             });
 
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 30; i++) {
                 let a = $("<div>").text(i);
                 a.element({
                     cssClass: "btn btn-danger"
                 });
 
-                $("#a1").scrollpane("addItem", a[0]);
+                $("#a1").scrollpane("add", a[0]);
             }
         });
 
         function removeOne() {
             let count = $("#a1").scrollpane("size");
             let idx = parseInt(Math.random() * count);
-            $("#a1").scrollpane("removeItem", idx);
+            $("#a1").scrollpane("remove", idx);
         }
     </script>
 </head>
 
 <body>
-    <div id="a1" style="height:140px;width:600px;">
-        <div>
+    <div id="a1" style="height:40px;width:600px;">
+       <!--  <div>
             <input type="text" class="form-control">
         </div>
         <div>
@@ -67,7 +74,7 @@
                 <option>2</option>
                 <option>3</option>
             </select>
-        </div>
+        </div> -->
     </div>
 
 

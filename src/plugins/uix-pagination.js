@@ -218,7 +218,8 @@
                                 compType: "element",
                                 compRole: "goto-text",
                                 opts: {
-                                    content: "&nbsp;页"
+                                    content: "&nbsp;页",
+                                    cssClass: "fsn"
                                 }
                             }]
                         }

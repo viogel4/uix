@@ -5,6 +5,7 @@
 		2.智能移动：一次移动一个元素。
 	*/
 	class ScrollPane extends uix.Panel {
+		static #DEFAULT_ORDER = 1000;
 		//静态变量
 		static initialCssStyle = {}; //初始行内样式
 		static initialCssClass = []; //初始类名称
@@ -16,27 +17,27 @@
 					target: "[data-comp-role~=prev]",
 					compRole: "prev",
 					compType: "button",
-					order: uix.Panel.DEFAULT_ORDER - 10,
+					order: ScrollPane.#DEFAULT_ORDER - 10,
 					opts: {
 						icon: "ico ico-16 iconify-arrow-left",
 						cssClass: "fsk-0 dpn",
 						onClick() {
 							let comp = uix.closestComp(this.getTarget(), "ScrollPane");
-							comp.doPrevAct();
+							comp.prev();
 						}
 					}
 				}, {
 					act: "add",
-					elem: "[data-comp-role=body]",
+					elem: "[data-comp-role~=body]",
 					compRole: "body",
-					order: uix.Panel.DEFAULT_ORDER,
+					order: ScrollPane.#DEFAULT_ORDER,
 					opts: {
 						cssClass: "fgw-1 aic",
 						layout: {
 							type: "row",
 							items: [{
 								act: "add",
-								elem: "[data-comp-role=container]",
+								elem: "[data-comp-role~=container]",
 								compRole: "container",
 								opts: {
 									layout: {
@@ -52,13 +53,13 @@
 					target: "[data-comp-role~=next]",
 					compRole: "next",
 					compType: "button",
-					order: uix.Panel.DEFAULT_ORDER + 10,
+					order: ScrollPane.#DEFAULT_ORDER + 10,
 					opts: {
 						icon: "ico ico-16 iconify-arrow-right",
 						cssClass: "fsk-0 dpn",
 						onClick() {
 							let comp = uix.closestComp(this.getTarget(), "ScrollPane");
-							comp.doNextAct();
+							comp.next();
 						}
 					}
 				}]
@@ -78,16 +79,36 @@
 			let state = this.getState();
 			state.left = 0;
 
-			///todo:初始化，待重构，不要写死成items[0]及items[1]
+			let prev, next;
+			let items = uix.valueByKey(options, "layout.items");
+			if (uix.isArray(items)) {
+				items.forEach(it => {
+					let roles = [];
+					if (it.compRole) {
+						roles = it.compRole.split(/\s+/);
+					}
+					let r = uix.valueByKey(it, "opts.role");
+					if (r) {
+						roles = roles.concat(r.split(/\s+/));
+					}
+
+					if (roles.includes("prev")) {
+						prev = it;
+					}
+					if (roles.includes("next")) {
+						next = it;
+					}
+				});
+			}
+
 			options = this.getOptions();
-			if (uix.isFunc(options.startAct)) {
-				uix.applyKey(options, "layout.items[0].opts.onClick", options.startAct);
+			if (uix.isFunc(options.startAct) && prev) {
+				uix.applyKey(prev, "opts.onClick", options.startAct);
 			}
 
-			if (uix.isFunc(options.endAct)) {
-				uix.applyKey(options, "layout.items[2].opts.onClick", options.endAct);
+			if (uix.isFunc(options.endAct) && next) {
+				uix.applyKey(next, "opts.onClick", options.endAct);
 			}
-
 			///////////////
 		}
 
@@ -105,15 +126,15 @@
 
 			super.render();
 
-			if (opts.alwaysShowActBtn !== false) {//是否始终问题显示翻页按钮
-				this.#setActBtnShown(true);
+			if (opts.alwaysShowBtns !== false) {//是否始终问题显示翻页按钮
+				this.#showBtns(true);
 			} else {
-				this.#setActBtnShown(false);
+				this.#showBtns(false);
 			}
 		}
 
-		//设置前后按钮是否显示
-		#setActBtnShown(show = true) {
+		//设置向前向后按钮是否显示
+		#showBtns(show = true) {
 			let $prev = this.children("[data-comp-role~=prev]");
 			let $next = this.children("[data-comp-role~=next]");
 
@@ -122,23 +143,27 @@
 			} else {
 				$prev.add($next).assignClass("dpn");
 			}
+			return this;
 		}
 
-		#getItemsContainer() {
-			return this.children("[data-comp-role~=body]").children("[data-comp-role~=container]");
+		#container;
+		#getContainer() {
+			if (uix.isNotValid(this.#container)) {
+				this.#container = this.children("[data-comp-role~=body]").children("[data-comp-role~=container]");
+			}
+			return this.#container;
 		}
 
-		//添加一个子组件到队列中，如果滚动面板未达到指定的个数，则添加到滚动面板中
-		//item是一个dom对象
-		addItem(item) {
-			let $container = this.#getItemsContainer();
+		//添加一个子组件到容器中，item是一个dom元素
+		add(item) {
+			let $container = this.#getContainer();
 			$container.append(item);
 		}
 
 		//移除一个子组件
-		removeItem(params) {
-			let $container = this.#getItemsContainer();
-			if (uix.isNumber(params)) {
+		remove(params) {
+			let $container = this.#getContainer();
+			if (uix.isNumber(params)) {//根据索引删除
 				$container.children().eq(params).element("destroy");
 			} else {//params为选择器
 				$container.children(params).element("destroy");
@@ -146,27 +171,32 @@
 			return this;
 		}
 
-		//返回子元素个数
-		size() {
-			let $container = this.#getItemsContainer();
-			return $container[0].childElementCount;
-		}
-
-		//返回指定位置的子元素（子项目）
-		getItem(idx) {
-			let $container = this.#getItemsContainer();
+		//返回指定位置的子元素，返回dom元素
+		get(idx) {
+			let $container = this.#getContainer();
 			return $container.get(idx);
 		}
 
-		//返回最后一个子元素
-		getLastItem() {
-			return this.getItem(this.size() - 1);
+		//返回第一项
+		getFirst() {
+			return this.get(0);
+		}
+
+		//返回最后一项
+		getLast() {
+			return this.get(this.size() - 1);
+		}
+
+		//返回子元素个数，实时获取
+		size() {
+			let $container = this.#getContainer();
+			return $container[0].childElementCount;
 		}
 
 		//向左，向上操作，内容溢出才会操作
 		//todo：移动指定个数
-		doNextAct(count = 1) {
-			let $container = this.#getItemsContainer();
+		next(count = 1) {
+			let $container = this.#getContainer();
 			let state = this.getState();
 			let opts = this.getOptions();
 
@@ -180,12 +210,16 @@
 			$container.animate({
 				left: state.left
 			}, opts.duration || 100, "swing");
+
+			console.log($(this.getFirst()).offset());
+
+			return this;
 		}
 
 		//向右，向下操作，内容溢出才会操作
 		//todo：移动指定个数
-		doPrevAct(count = 1) {
-			let $container = this.#getItemsContainer();
+		prev(count = 1) {
+			let $container = this.#getContainer();
 			let state = this.getState();
 			let opts = this.getOptions();
 			state.left += (opts.delta || 100);
@@ -197,6 +231,20 @@
 			$container.animate({
 				left: state.left
 			}, opts.duration || 100, "swing");
+
+			console.log($(this.getFirst()).offset());
+
+			return this;
+		}
+
+		//获取当前在最左边的子项
+		getCurrentLeft() {
+
+		}
+
+		//获取当前在最右边的子项
+		getCurrentRight() {
+
 		}
 		////
 	}
@@ -217,7 +265,7 @@
 	$.fn.scrollpane.defaults = $.extend(true, {}, $.fn.panel.defaults, {
 		//prevAct: null,//点击向左，或向上时的处理动作函数
 		//nextAct: null,//点击向右，或向下时的处理动作函数
-		alwaysShowActBtn: false,//是否总是显示向前及向后的按钮，值可为true|false
+		alwaysShowBtns: false,//是否总是始终向前及向后的按钮，值为true时表示不管子项是否超过容器，都终始显示上下按钮
 		smartScroll: true,//todo:智能滚动，每次滚动一个元素
 		delta: 50,//todo:单次移动距离
 		duration: 100,//todo:单次动画时长
