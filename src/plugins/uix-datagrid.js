@@ -303,13 +303,13 @@
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = ["-ofh", "ofv"]; //初始类名称
 
-        //全局默认配置，树型配置，而$.fn.window.defaults是扁平配置
+        //全局初始配置
         static initialOptions = {
             header: {
                 opts: {
                     icon: {
                         act: "set",
-                        elem: "[data-comp-role=start-icon]",
+                        elem: "[data-comp-role~=si]",
                         compType: "element",
                         opts: {
                             cssClass: "ico ico-16 iconify-window mx-1 fsk-0"
@@ -320,7 +320,7 @@
                         compType: "button",
                         compRole: "collapse",
                         opts: {
-                            startIcon: "ico ico-16 iconify-window-collapse",
+                            icon: "ico ico-16 iconify-window-collapse",
                             onClick: function (e) {
                                 let grid = uix.closestComp(e.currentTarget, "DataGrid");
                                 let handler = grid.getOptions().toggleExpandHandler;
@@ -445,7 +445,7 @@
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: DataGrid.initialCssClass,
                 cssStyle: DataGrid.initialCssStyle
             }, DataGrid.initialOptions, opts);
@@ -453,7 +453,7 @@
             //头部工具栏
             let hToolsKey = "header.opts.endIcons";
             //自定义头部工具栏
-            if (Array.isArray(options.headerTools) && options.headerTools.length > 0) {
+            if (uix.isArray(options.headerTools) && options.headerTools.length > 0) {
                 uix.applyKey(options, hToolsKey, options.headerTools, true);
             }
 
@@ -468,11 +468,6 @@
             }
 
             super(domSrc, options);
-        }
-
-
-        getCompType() {
-            return "datagrid";
         }
 
         //渲染组件。data表示要渲染的数据，renderer表示渲染器
@@ -490,6 +485,7 @@
             if (uix.isFunc(opts.loader)) {
                 let pagination = this.getPagination().asComp();//分页组件实例
                 let pageNo, pageSize;
+
                 if (pagination) {
                     pageNo = pagination.getPageNo();
                     pageSize = pagination.getPageSize();
@@ -500,13 +496,14 @@
                     if (resp !== false) {
                         if (resp.success === false || uix.isValid(resp.error)) {
                             uix.info(resp.error || "加载远程服务器数据时异常");
-                            this.setData([],renderer);
+                            this.setData([], renderer);
                             return;
                         }
 
                         if (uix.isValid(resp.data)) {
                             this.setData(resp.data, renderer);
                         }
+
                         if (pagination) {
                             pagination.setPaginateInfo({
                                 pageNo: resp.pageNo,
@@ -534,11 +531,11 @@
                     state.expanded = true;
 
                     //回调事件监听器
-                    if ($.isFunction(DataGrid.Listeners.onExpand)) {
+                    if (uix.isFunc(DataGrid.Listeners.onExpand)) {
                         DataGrid.Listeners.onExpand.call(me);
                     }
 
-                    if ($.isFunction(callback)) {
+                    if (uix.isFunc(callback)) {
                         callback.call(me, dom);
                     }
                 });
@@ -557,7 +554,7 @@
                 let bt = $(dom).css("border-top-width").replace("px", "");
                 let bb = $(dom).css("border-bottom-width").replace("px", "");
 
-                let $header = $(dom).children("[data-comp-role=header]");
+                let $header = $(dom).children("[data-comp-role~=header]");
 
                 $(dom).animate({
                     height: $header.outerHeight() + parseFloat(bt) + parseFloat(bb)
@@ -565,11 +562,11 @@
                     state.expanded = false;
 
                     //回调事件监听器
-                    if ($.isFunction(DataGrid.Listeners.onCollapse)) {
+                    if (uix.isFunc(DataGrid.Listeners.onCollapse)) {
                         DataGrid.Listeners.onCollapse.call(me);
                     }
 
-                    if ($.isFunction(callback)) {
+                    if (uix.isFunc(callback)) {
                         callback.call(me, dom);
                     }
                 });
@@ -636,31 +633,14 @@
 
     //快捷创建语法
     $.fn.datagrid = function (options, ...params) {
-        if (typeof options === "string") {
-            let method = $.fn.datagrid.methods[options];
-            if (method) {
-                return method($(this), ...params);
-            } else {
-                return $(this).card(options, ...params);
-            }
-        }
-
-        options = options || {};
-        return $(this).each(function () {
-            let opts = uix.compOptions(this, "datagrid", options);
-
-            //每次会重建对象，重建对象时，会合并扩展之前的配置
-            let elem = new DataGrid(this, opts);
-            elem.render(); //手动执行渲染
-
-            //注意：打开窗口，需要手动调用open方法
-        });
+        return uix.make(this, DataGrid, options, ...params);
     };
 
     //所有方法
     $.fn.datagrid.methods = {
         expand: ($jq, cb) => uix.each($jq, t => t.expand(cb)),
         collapse: ($jq, cb) => uix.each($jq, t => t.collapse(cb)),
+        //todo：将setData和getData合并成一个函数
         setData: ($jq, data) => uix.each($jq, t => t.setData(data)),
         getData: $jq => $jq.asComp().getData(),
         //获取所有选中项
