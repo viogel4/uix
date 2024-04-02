@@ -9,13 +9,13 @@
         static initialCssStyle = {}; //初始行内样式
         static initialCssClass = []; //初始类名称
 
-        //全局默认配置
+        //全局初始配置
         static initialOptions = {
             direction: "column"
         };
 
         constructor(domSrc, opts = {}) {
-            let options = uix.handleOptions({}, {
+            let options = uix.options({}, {
                 cssClass: Accordion.initialCssClass,
                 cssStyle: Accordion.initialCssStyle
             }, Accordion.initialOptions, opts);
@@ -24,7 +24,7 @@
             let items = uix.applyKey(options, "items", []);
             let list = options.list || [];
             if (uix.isArray(list)) {
-                list.forEach(it => items.push(uix.handleOptions({
+                list.forEach(it => items.push(uix.options({
                     compType: "card",
                     compRole: "item",
                     order: order++,
@@ -49,10 +49,6 @@
             }
 
             super(domSrc, options);
-        }
-
-        getCompType() {
-            return "accordion";
         }
 
         //监听器
@@ -167,7 +163,7 @@
     uix.Accordion = Accordion;
 
     $.fn.accordion = function (options, ...params) {
-        return uix.applyOrNew(this, "accordion", "inline", Accordion, options, ...params);
+        return uix.make(this, Accordion, options, ...params);
     };
 
     //所有方法
