@@ -48,7 +48,7 @@ todo:
 50.scrollpane组件，未完成，有很多todo。
 智能滚动。每次滚动一个，或多个。
 
-51.重构uix.each函数，写一个uix.forEach函数
+51.重构uix.each函数，写一个uix.forEach函数。scrollpanel 265行要用。
 
 
 
