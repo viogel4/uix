@@ -171,10 +171,20 @@
 			return this;
 		}
 
+		//获取所有子元素，dom数组
+		getAll() {
+			let $container = this.#getContainer();
+			return $container[0].children;
+		}
+
 		//返回指定位置的子元素，返回dom元素
 		get(idx) {
-			let $container = this.#getContainer();
-			return $container.get(idx);
+			if (idx < 0 || idx > this.size()) {
+				throw new Error("不合法的索引");
+			}
+
+			let all = this.getAll();
+			return all[idx];
 		}
 
 		//返回第一项
@@ -209,9 +219,12 @@
 
 			$container.animate({
 				left: state.left
-			}, opts.duration || 100, "swing");
+			}, opts.duration || 100, "swing", () => {
+				console.log($(this.getFirst()).position());
 
-			console.log($(this.getFirst()).offset());
+				let cl = this.getCurrentLeft();
+				console.log($(cl).text());
+			});
 
 			return this;
 		}
@@ -230,16 +243,42 @@
 
 			$container.animate({
 				left: state.left
-			}, opts.duration || 100, "swing");
+			}, opts.duration || 100, "swing", () => {
+				console.log($(this.getFirst()).position());
+			});
 
-			console.log($(this.getFirst()).offset());
+
 
 			return this;
 		}
 
 		//获取当前在最左边的子项
 		getCurrentLeft() {
+			let current;
 
+			let all = this.getAll();
+
+
+			console.log(all);
+
+
+			all.forEach(it => {
+				let pos = $(it).position();
+				let lft = pos.left;
+				let rgt = lft + $(it).outerWidth();
+
+				if (rgt > 0) {
+					current = it;
+					return false;//break循环
+				}
+
+				if (lft > 0) {//lft大于等于0的第一个即current
+					current = this;
+					return false;
+				}
+			});
+
+			return current;
 		}
 
 		//获取当前在最右边的子项
