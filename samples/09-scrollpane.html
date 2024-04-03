@@ -36,13 +36,16 @@
 
     <script>
         $(function () {
-           /*  $("#a1").scrollpane({
-                bordered: true
-            }); */
+            /*  $("#a1").scrollpane({
+                 bordered: true
+             }); */
 
             $("#a1").scrollpane({
                 bordered: true,
-                alwaysShowBtns: true
+                alwaysShowBtns: true,
+                smartScroll: true,
+                duration: 50,
+                continueMove: true
             });
 
             for (let i = 0; i < 30; i++) {
@@ -65,7 +68,7 @@
 
 <body>
     <div id="a1" style="height:40px;width:600px;">
-       <!--  <div>
+        <!--  <div>
             <input type="text" class="form-control">
         </div>
         <div>

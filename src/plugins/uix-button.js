@@ -49,7 +49,7 @@
 			//绑定单击事件，按钮阻止默认事件，并阻止向上传递
 			let handler = opts.handler || opts.onClick;
 			if (uix.isFunc(handler)) {
-				super.off("click.ubc").on("click.ubc", function (e) {
+				super.off("click.ubc").on("click.ubc", function (e) {//ubc：uix-button-click
 					e.preventDefault();
 					e.stopPropagation();
 					handler.call(this, e);

@@ -121,15 +121,6 @@
 		return stream.length > 0 ? stream[0] : undefined;
 	};
 
-	//数组及类数组遍历
-	uix.forEach = function (arraylike, cb) {
-		if (uix.isArray(arraylike)) {
-			arraylike.forEach(cb);
-		} else {
-			Array.prototype.forEach.call(arraylike, cb);
-		}
-	};
-
 	//向祖先方向查找离当前元素最近的组件
 	uix.closestComp = function (child, type = "Element") {
 		let $parent = $(child);
