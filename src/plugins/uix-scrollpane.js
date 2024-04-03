@@ -258,21 +258,21 @@
 
 			let all = this.getAll();
 
-
-			console.log(all);
-
-
-			all.forEach(it => {
+			uix.forEach(all, it => {
 				let pos = $(it).position();
 				let lft = pos.left;
 				let rgt = lft + $(it).outerWidth();
 
-				if (rgt > 0) {
+				console.log(lft, rgt);
+
+				if (rgt > 0) {console.log("aaaa");
 					current = it;
 					return false;//break循环
 				}
 
 				if (lft > 0) {//lft大于等于0的第一个即current
+
+					console.log("bbb");
 					current = this;
 					return false;
 				}
