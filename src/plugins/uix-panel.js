@@ -215,16 +215,27 @@
 			return false;//返回false代表未创建
 		}
 
-		//查找拥有指定角色的后代组件
-		descendantsByRole(role) {
-			let $descendant = $(this.getTarget()).find("[data-comp-role]");
-			return uix.compsByRole($descendant, role);
+		//查找拥有指定角色的后代组件数组，第二个参数表示是否仅查询子代，第三个参数表示是否查询所有后代，若是，则返回数组
+		descendants(role, children = true, queryAll = false) {
+			let $descendants;
+			if (children !== true) {
+				$descendants = $(this.getTarget()).find("[data-comp-role]");
+			} else {
+				$descendants = $(this.getTarget()).children("[data-comp-role]");
+			}
+
+			let results = uix.compsByRole($descendants, role);
+
+			if (queryAll) {
+				return results;
+			} else {
+				return results.length > 0 ? results[0] : null;
+			}
 		}
 
-		//查找拥有指定角色的子代组件
-		childrenByRole(role) {
-			let $children = $(this.getTarget()).children("[data-comp-role]");
-			return uix.compsByRole($children, role);
+		//查询所有后代元素
+		descendantsAll(role, children = true) {
+			return this.descendants(role, children, true);
 		}
 
 		/**

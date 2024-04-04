@@ -159,22 +159,19 @@
 			return this;
 		}
 
-		//获取头部组件，仅返回第一个匹配
+		//获取header组件，仅返回第一个匹配
 		getHeader() {
-			let headers = super.childrenByRole("header");
-			return headers.length > 0 ? headers[0] : null;
+			return this.descendants("header", true);
 		}
 
-		//获取主体组件，仅返回第一个匹配
+		//获取body组件，仅返回第一个匹配
 		getBody() {
-			let bodies = super.childrenByRole("body");
-			return bodies.length > 0 ? bodies[0] : null;
+			return this.descendants("body", true);
 		}
 
-		//获取脚部组件，仅返回第一个匹配
+		//获取footer组件，仅返回第一个匹配
 		getFooter() {
-			let footers = super.childrenByRole("footer");
-			return footers.length > 0 ? footers[0] : null;
+			return this.descendants("footer", true);
 		}
 		//////
 	}

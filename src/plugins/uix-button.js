@@ -81,7 +81,7 @@
 			return this;
 		}
 
-		//设置按钮文本
+		//设置按钮文本，如果text没有内容，则移除buttonText
 		setText(text) {
 			this.#buttonText = text;
 			let item;

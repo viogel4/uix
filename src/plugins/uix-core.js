@@ -614,6 +614,34 @@
 		return date;
 	};
 
+	//判断年份是否闰年
+	uix.isLeapYear = (year) => {
+		return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
+	};
+
+	//返回一个月有多少天
+	uix.getDayCount = (year, month) => {
+		switch (month) {
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+			case 8:
+			case 10:
+			case 12:
+				return 31;
+			case 2:
+				return uix.isLeapYear(year) ? 29 : 28;
+			case 4:
+			case 6:
+			case 9:
+			case 11:
+				return 30;
+			default:
+				throw new Error("错误的月份");
+		}
+	};
+
 	//绑定到jquery上
 	$.fn.assignStyle = function (options) {
 		return $(this).each((_, t) => uix.assignStyle(t, options));

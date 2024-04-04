@@ -3,36 +3,84 @@
     color: rgb(119, 119, 119);
 }
 
-[data-comp-type=calendar] [data-comp-role=current-year] i,
-[data-comp-type=calendar] [data-comp-role=current-month] i {
+[data-comp-type=calendar] [data-comp-role~=current-year] i,
+[data-comp-type=calendar] [data-comp-role~=current-month] i {
     font-style: normal;
 }
 
-[data-comp-type=calendar] .calendar-body tr>th {
+/* 日期面板 */
+[data-comp-type=calendar] .days-body tr>th {
     color: #333;
     width: 36px;
     height: 30px;
     text-align: center;
 }
 
-[data-comp-type=calendar] .calendar-body tr>td {
+[data-comp-type=calendar] .days-body tr>td {
     color: #777;
     text-align: center;
     height: 30px;
     cursor: pointer;
 }
 
-[data-comp-type=calendar] .calendar-body tr>td:hover {
+[data-comp-type=calendar] .days-body tr>td:hover {
     background-color: #eee;
     color: #333;
 }
 
-[data-comp-type=calendar] .calendar-body tr>td.prev-month,
-[data-comp-type=calendar] .calendar-body tr>td.next-month {
+[data-comp-type=calendar] .days-body tr>td.prev-month,
+[data-comp-type=calendar] .days-body tr>td.next-month {
     color: #d2d2d2;
 }
 
-[data-comp-type=calendar] .calendar-body tr>td.current {
+[data-comp-type=calendar] .days-body tr>td.current {
+    color: #fff;
+    background-color: #16baaa;
+}
+
+
+/* 年份面板 */
+[data-comp-type=calendar] .years-body {
+    width: 100%;
+    height: 100%;
+}
+
+[data-comp-type=calendar] .years-body tr>td {
+    text-align: center;
+    color: rgb(119, 119, 119);
+    cursor: pointer;
+}
+
+[data-comp-type=calendar] .years-body tr>td:hover {
+    color: #333;
+    background-color: #eee;
+}
+
+[data-comp-type=calendar] .years-body tr>td.current {
+    color: #fff;
+    background-color: #16baaa;
+}
+
+/* 月份面板 */
+[data-comp-type=calendar] .months-body {
+    width: 100%;
+    height: 100%;
+}
+
+[data-comp-type=calendar] .months-body tr>td {
+    text-align: center;
+    color: rgb(119, 119, 119);
+    cursor: pointer;
+    width: 25%;
+    box-sizing: border-box;
+}
+
+[data-comp-type=calendar] .months-body tr>td:hover {
+    color: #333;
+    background-color: #eee;
+}
+
+[data-comp-type=calendar] .months-body tr>td.current {
     color: #fff;
     background-color: #16baaa;
 }

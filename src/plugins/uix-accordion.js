@@ -23,6 +23,7 @@
             let order = Accordion.#DEFAULT_ORDER;
             let items = uix.applyKey(options, "items", []);
             let list = options.list || [];
+
             if (uix.isArray(list)) {
                 list.forEach(it => items.push(uix.options({
                     compType: "card",
@@ -39,8 +40,20 @@
                         },
                         body: {
                             opts: {
-                                content: it.content || "",
-                                cssClass: "collapsed"
+                                layout: {
+                                    items: [{
+                                        compType: "panel",
+                                        opts: {
+                                            content: it.content || "",
+                                            cssClass: "h-100 -dpi-f dpb",
+                                            cssStyle: {
+                                                minHeight: 0
+                                            }
+                                        }
+                                    }
+                                    ]
+                                },
+                                cssClass: "-dpi-f dpg"
                             }
                         },
                         cssClass: "bbd w-100"

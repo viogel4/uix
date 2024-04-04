@@ -1,5 +1,12 @@
+/* 面板收缩动画 */
+[data-comp-type=accordion]>[data-comp-type=card]>[data-comp-role~=body] {
+    transition: all .3s;
+    grid-template-rows: 1fr;
+}
+
 [data-comp-type=accordion]>[data-comp-type=card].collapsed>[data-comp-role~=body] {
-    height: 0;
+    /* height: 0; */
+    grid-template-rows: 0fr;
 }
 
 [data-comp-type=accordion]>[data-comp-type=card].collapsed {

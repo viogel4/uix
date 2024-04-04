@@ -115,10 +115,14 @@
 	}
 
 	//遍历每一个组件，执行指定的操作。如果是uix组件，则调用回调函数cb，否则忽略
-	//若有返回值，则仅返回第一个调用的返回值
+	//若有返回值，则仅返回第一个调用的返回值。注意：第一个参数是jquery对象
 	uix.each = function ($jq, cb) {
+		if (!uix.isJQuery($jq)) {
+			throw new Error("第一个参数必须是jquery对象");
+		}
+		
 		let stream = $($jq).comps().map(it => cb(it));
-		return stream.length > 0 ? stream[0] : undefined;
+		return stream.length > 0 ? stream[0] : null;
 	};
 
 	//向祖先方向查找离当前元素最近的组件

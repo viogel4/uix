@@ -158,6 +158,10 @@
 	display: none;
 }
 
+.dpg {
+	display: grid;
+}
+
 .psr {
 	position: relative;
 }

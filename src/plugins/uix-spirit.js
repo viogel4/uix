@@ -123,18 +123,17 @@
 
 		//返回主体组件，仅允许有一个主体
 		getBody() {
-			let bodies = super.childrenByRole("body");
-			return bodies.length > 0 ? bodies[0] : null;
+			return this.descendants("body");
 		}
 
 		//获取start-icon组件
 		getStartIcons() {
-			return super.childrenByRole("si");
+			return this.descendants("si", true, true);
 		}
 
 		//获取end-icon组件
 		getEndIcons() {
-			return super.childrenByRole("ei");
+			return this.descendants("ei", true, true);
 		}
 		////
 	}

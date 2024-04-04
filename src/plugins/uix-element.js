@@ -81,12 +81,12 @@
 			return $("[data-comp-for=" + this.getId() + "]", win.document);
 		}
 
-		//查询后代dom元素
+		//查询后代dom元素，返回jquery对象
 		find(selector) {
 			return $(this.getTarget()).find(selector);
 		}
 
-		//查询子代dom元素
+		//查询子代dom元素，返回jquery对象
 		children(selector) {
 			return $(this.getTarget()).children(selector);
 		}
@@ -128,11 +128,7 @@
 			this.assignStyle(opts.cssStyle);
 
 			//设置内容
-			if (uix.isString(opts.content)) {
-				$(target).html(opts.content);
-			} else if (uix.isJQuery(opts.content)) {//如果content是在文档中已存在的对象
-				$(target).empty().append(opts.content);
-			}
+			this.setContent(opts.content);
 
 			//组件唯一标识。使用attr可以保证可见性
 			$(target).attr("data-comp-id", opts.id);
@@ -155,6 +151,22 @@
 
 			//设置启用状态
 			this.setEnabled(this.getEnabled());
+		}
+
+		//设置内容，参数可以是文本，html或dom，或jquery对象
+		setContent(content) {
+			if (uix.isNotValid(content)) {
+				return this;
+			}
+
+			let target = this.getTarget();
+			//设置内容
+			if (uix.isString(content)) {
+				$(target).html(content);
+			} else {//如果content是在文档中已存在的对象
+				$(target).empty().append($(content));
+			}
+			return this;
 		}
 
 		//即时渲染，样式不添加到现有配置选项中
@@ -230,6 +242,46 @@
 
 			//销毁附属组件
 			this.getAssistants().element("destroy");
+		}
+
+		/**
+		 *委托jquery，执行指令 
+		 * */
+		do(command, ...params) {
+			let dom = this.getTarget();
+			return $(dom)[command].call($(dom), ...params);
+		}
+
+		width(outer = false) {
+			if (uix.isNumber(outer)) {
+				this.do("width", outer);
+				return this;
+			} else {
+				return outer ? this.do("outerWidth") : this.do("width");
+			}
+		}
+
+		height(outer = false) {
+			if (uix.isNumber(outer)) {
+				this.do("height", outer);
+				return this;
+			} else {
+				return outer ? this.do("outerHeight") : this.do("height");
+			}
+		}
+
+		offset() {
+			return this.do("offset");
+		}
+
+		show() {
+			this.do("show");
+			return this;
+		}
+
+		hide() {
+			this.do("hide");
+			return this;
 		}
 
 		//以jquery对象的方式继续执行其它操作

@@ -40,12 +40,46 @@
         $(function () {
             $("#a3").calendar({
                 enabled: true,
-                onDayCellClick: it => {
+                onDayClick: it => {
                     console.log(it);
                 }
             });
 
+            $("#showYear").button({
+                handler: () => {
+                    $("#a3").calendar("showYears", {
+                        click(day) {
+                            console.log(day);
+                        }
+                    });
+                }
+            });
 
+            $("#showMonth").button({
+                handler() {
+                    $("#a3").calendar("showMonths", {
+                        click(y, m) {
+                            console.log(y, m);
+                        }
+                    });
+                }
+            });
+
+            $("#showDay").button({
+                handler() {
+                    $("#a3").calendar("showDays", {
+                        click(y, m, d) {
+                            console.log(y, m);
+                        }
+                    });
+                }
+            });
+
+            $("#showTime").button({
+                handler() {
+
+                }
+            });
         });
     </script>
 </head>
@@ -53,6 +87,13 @@
 <body>
     <div>
         <div id="a3"></div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button type="button" id="showYear">显示年</button>
+        <button type="button" id="showMonth">显示月</button>
+        <button type="button" id="showDay">显示日</button>
+        <button type="button" id="showTime">显示时间</button>
     </div>
 </body>
 
