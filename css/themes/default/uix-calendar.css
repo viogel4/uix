@@ -1,6 +1,10 @@
 [data-comp-type=calendar] {
     font-size: 14px;
     color: rgb(119, 119, 119);
+    min-width: 240px;
+    min-height: 260px;
+    width: 240px;
+    height: 260px;
 }
 
 [data-comp-type=calendar] [data-comp-role~=current-year] i,
@@ -83,4 +87,14 @@
 [data-comp-type=calendar] .months-body tr>td.current {
     color: #fff;
     background-color: #16baaa;
+}
+
+/* 时间面板 */
+[data-comp-type=calendar] .time-body>.timeheader {
+    display: flex;
+}
+
+[data-comp-type=calendar] .time-body>.timeheader>div {
+    width: 100%;
+    text-align: center;
 }

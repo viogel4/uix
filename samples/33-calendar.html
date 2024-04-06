@@ -77,7 +77,11 @@
 
             $("#showTime").button({
                 handler() {
-
+                    $("#a3").calendar("showTime", {
+                        click(y, m, d) {
+                            console.log(y, m);
+                        }
+                    });
                 }
             });
         });
