@@ -13,7 +13,7 @@
 
 
         //下拉项顺序
-        #listItemOrder = ComboBox.#DEFAULT_ORDER;
+        #ListItemOrder = ComboBox.#DEFAULT_ORDER;
 
         constructor(domSrc, opts = {}) {
             let options = uix.options({}, {
@@ -184,7 +184,7 @@
                         act: "add",
                         compType: "spirit",
                         compRole: "list-item-group",
-                        order: this.#listItemOrder++,
+                        order: this.#ListItemOrder++,
                         opts: {
                             id: uix.isValid(g.id) ? g.id : undefined,
                             icon: uix.isValid(g.icon) ? g.icon : undefined,
@@ -251,7 +251,7 @@
                 act: "add",
                 compType: "button",
                 compRole: "list-item",
-                order: this.#listItemOrder++,
+                order: this.#ListItemOrder++,
                 opts: {
                     icon: "ico ico-16"
                 }
