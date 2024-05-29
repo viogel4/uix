@@ -1,6 +1,6 @@
 (function ($) {
 	/**
-	 * 所有组件的基础继承类，不作为容器使用，是不可分割的组件，不能包含其它组件
+	 * 所有组件的基础继承类，不能作为容器使用，不能包含其它子组件
 	 */
 	class Element {
 		//公共静态变量，开发者可自由设置重写
@@ -9,7 +9,7 @@
 		static initialOptions = {}; //全局默认初始配置
 
 		//私有成员变量
-		#domSrc; //源dom，亦即api操作的dom
+		#domSrc; //源dom，即api操作的dom
 		#domTarget;//目标dom，有可能是domSrc，也有可能是domSrc的引用dom
 		#opts; //组件配置项，object类型
 		#state; //组件状态表，object类型
@@ -245,7 +245,7 @@
 		}
 
 		/**
-		 *委托jquery，执行指令 
+		 *委托jquery，执行jquery指令 
 		 * */
 		do(command, ...params) {
 			let dom = this.getTarget();

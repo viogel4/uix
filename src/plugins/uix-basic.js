@@ -120,7 +120,7 @@
 		if (!uix.isJQuery($jq)) {
 			throw new Error("第一个参数必须是jquery对象");
 		}
-		
+
 		let stream = $($jq).comps().map(it => cb(it));
 		return stream.length > 0 ? stream[0] : null;
 	};
@@ -228,11 +228,11 @@
 	//查找拥有某个角色的组件，返回组件数组
 	uix.compsByRole = ($jq, role) => $($jq).comps().filter(it => it.hasRole(role));
 
-	//连续执行组件的多个函数调用
+	//组件的链式函数调用，通过jquery对象连续调用
 	$.fn.and = function (...params) {
 		return $(this).each(function () {
 			let type = $(this).asComp().getCompType();
-			$(this)[type](...params)
+			$(this)[type](...params);
 		});
 	};
 
