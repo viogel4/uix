@@ -1,0 +1,100 @@
+[data-comp-type=calendar] {
+    font-size: 14px;
+    color: rgb(119, 119, 119);
+    min-width: 240px;
+    min-height: 260px;
+    width: 240px;
+    height: 260px;
+}
+
+[data-comp-type=calendar] [data-comp-role~=current-year] i,
+[data-comp-type=calendar] [data-comp-role~=current-month] i {
+    font-style: normal;
+}
+
+/* 日期面板 */
+[data-comp-type=calendar] .days-body tr>th {
+    color: #333;
+    width: 36px;
+    height: 30px;
+    text-align: center;
+}
+
+[data-comp-type=calendar] .days-body tr>td {
+    color: #777;
+    text-align: center;
+    height: 30px;
+    cursor: pointer;
+}
+
+[data-comp-type=calendar] .days-body tr>td:hover {
+    background-color: #eee;
+    color: #333;
+}
+
+[data-comp-type=calendar] .days-body tr>td.prev-month,
+[data-comp-type=calendar] .days-body tr>td.next-month {
+    color: #d2d2d2;
+}
+
+[data-comp-type=calendar] .days-body tr>td.current {
+    color: #fff;
+    background-color: #16baaa;
+}
+
+
+/* 年份面板 */
+[data-comp-type=calendar] .years-body {
+    width: 100%;
+    height: 100%;
+}
+
+[data-comp-type=calendar] .years-body tr>td {
+    text-align: center;
+    color: rgb(119, 119, 119);
+    cursor: pointer;
+}
+
+[data-comp-type=calendar] .years-body tr>td:hover {
+    color: #333;
+    background-color: #eee;
+}
+
+[data-comp-type=calendar] .years-body tr>td.current {
+    color: #fff;
+    background-color: #16baaa;
+}
+
+/* 月份面板 */
+[data-comp-type=calendar] .months-body {
+    width: 100%;
+    height: 100%;
+}
+
+[data-comp-type=calendar] .months-body tr>td {
+    text-align: center;
+    color: rgb(119, 119, 119);
+    cursor: pointer;
+    width: 25%;
+    box-sizing: border-box;
+}
+
+[data-comp-type=calendar] .months-body tr>td:hover {
+    color: #333;
+    background-color: #eee;
+}
+
+[data-comp-type=calendar] .months-body tr>td.current {
+    color: #fff;
+    background-color: #16baaa;
+}
+
+/* 时间面板 */
+[data-comp-type=calendar] .time-body>.timeheader {
+    display: flex;
+}
+
+[data-comp-type=calendar] .time-body>.timeheader>div {
+    width: 100%;
+    text-align: center;
+}

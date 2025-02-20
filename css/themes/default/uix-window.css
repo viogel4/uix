@@ -1,0 +1,38 @@
+.wbtn {
+	padding: 3px;
+}
+
+/* 窗口标题右侧工具栏小按钮 */
+.wbtn>[data-comp-role~=si] {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center center;
+}
+
+.wbtn:hover {
+	background-color: var(--uix-grey-200);
+}
+
+/* 背景遮罩 */
+.window-mask {
+	background-color: rgba(0, 0, 0, .08);
+}
+
+/* 窗口最小化的任务栏 */
+.window-task-bar {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 36px;
+	background-color: rgb(245, 245, 245);
+}
+
+/* 任务栏中的最小化窗口鼠标滑过时的颜色 */
+.window-task-bar [data-comp-role~=header]:hover,
+.window-task-bar [data-comp-role~=panel-mask]:hover {
+	background-color: var(--uix-orange);
+	opacity: .5;
+}

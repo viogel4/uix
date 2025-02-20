@@ -1,0 +1,4 @@
+/* 表单元素默认宽度 */
+[data-comp-type=input] {
+    min-width: 200px;
+}

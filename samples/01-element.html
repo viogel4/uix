@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Element组件示例</title>
+	<!-- 组件css -->
+	<link rel="stylesheet" href="../css/uix-reset.css">
+	<link rel="stylesheet" href="../css/uix-basic.css">
+	<link rel="stylesheet" href="../css/uix-utility.css">
+	<link rel="stylesheet" href="../css/uix-icon.css" />
+
+	<!-- 皮肤css -->
+	<link rel="stylesheet" href="../css/themes/default/uix-element.css">
+	<link rel="stylesheet" href="css/custom.css">
+	<script src="../jquery-3.7.1.min.js"></script>
+	<script src="../src/plugins/uix-core.js"></script>
+	<script src="../src/plugins/uix-basic.js"></script>
+	<script src="../src/plugins/uix-element.js"></script>
+
+	<script>
+		$(() => {
+			$("#a1").element({
+				cssStyle: {
+					width: "100px",
+					height: "100px",
+					backgroundColor: "pink",
+					position: "absolute",
+					top: "100px",
+					left: "100px"
+				},
+				enabled: true
+			}).and("click", () => console.log("ddd"))
+				.and("click", () => console.log("fff"));
+
+			//and方法定义在basic.js中，表示组件函数的连续调用，and函数可以替换成element函数
+			//////////////////////////////////////////
+
+			$("#a1").click(function () {
+				$(this).width(300);
+			});
+
+
+		});
+	</script>
+	<style>
+
+	</style>
+</head>
+
+<body>
+	<div id="a1" title="你好" style="transition: width .5s;">
+		<h3>基础组件</h3>
+	</div>
+</body>
+
+</html>

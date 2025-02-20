@@ -1,0 +1,65 @@
+/* 1.滚动条美化，注意：此设置仅对webkit有效 */
+::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: rgba(50, 50, 50, .3);
+}
+
+::-webkit-scrollbar-track {
+	background-color: rgba(50, 50, 50, .1);
+}
+
+/* 2.基础颜色样式 */
+:root {
+	--uix-blue: #007ddc;
+	--uix-violet: #642dd7;
+	--uix-purple: #a01ec8;
+	--uix-pink: #dc238c;
+	--uix-red: #e61414;
+	--uix-orange: #ff6c00;
+	--uix-yellow: #ffbe00;
+	--uix-olive: #afc800;
+	--uix-green: #41aa00;
+	--uix-brown: #be5f1e;
+	--uix-teal: #00beb4;
+	--uix-white: #fff;
+	--uix-grey: #646464;
+	--uix-black: #1e1e1e;
+	--uix-grayish: #e1e1e1;
+	--uix-light: #fafafa;
+	--uix-dark: #212529;
+	--uix-darkblue: #004b96;
+	--uix-grey-100: #f8f9fa;
+	--uix-grey-200: #e9ecef;
+	--uix-grey-300: #dee2e6;
+	--uix-grey-400: #ced4da;
+	--uix-grey-500: #adb5bd;
+	--uix-grey-600: #6c757d;
+	--uix-grey-700: #495057;
+	--uix-grey-800: #343a40;
+	--uix-grey-900: #212529;
+
+	/* 10px */
+	--uix-base-dist: calc(var(--uix-base-fs, 10px));
+
+	/* 2.5px */
+	--uix-d1u: calc(var(--uix-base-dist) * .25);
+
+	/* 5px */
+	--uix-d2u: calc(var(--uix-base-dist) * .5);
+
+	/* 10px */
+	--uix-d3u: calc(var(--uix-base-dist));
+
+	/* 20px */
+	--uix-d4u: calc(var(--uix-base-dist) * 2);
+
+	/* 40px */
+	--uix-d5u: calc(var(--uix-base-dist) * 4);
+
+	/* 默认边框 */
+	--uix-default-border: 1px solid #ccc;
+}

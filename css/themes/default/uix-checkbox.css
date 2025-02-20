@@ -1,0 +1,36 @@
+[data-comp-type=checkbox]>[data-comp-role~=outbody] {
+    width: var(--uix-d4u, 1.25rem);
+    height: var(--uix-d4u, 1.25rem);
+    border-width: 1.5px;
+    border-color: #c2c2c2;
+    border-style: solid;
+}
+
+[data-comp-type=checkbox].checked>[data-comp-role~=outbody],
+[data-comp-type=checkbox].half-checked>[data-comp-role~=outbody] {
+    border-color: #5FB878;
+}
+
+/* 半选状态 */
+[data-comp-type=checkbox].half-checked>[data-comp-role~=outbody]::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background-color: #5FB878;
+    position: absolute;
+}
+
+[data-comp-type=checkbox]>[data-comp-role~=label] {
+    margin: 0 5px;
+}
+
+/* 单选按钮禁用样式 */
+[data-comp-type=checkbox].disabled {
+    background-color: unset;
+    cursor: not-allowed;
+}
+
+[data-comp-type=checkbox].disabled>.panel-mask {
+    background-color: unset;
+}

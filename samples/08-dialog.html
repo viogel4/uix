@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Dialog组件代码示例</title>
+
+	<link rel="stylesheet" href="../css/uix-reset.css">
+	<link rel="stylesheet" href="../css/uix-basic.css">
+	<link rel="stylesheet" href="../css/uix-utility.css">
+	<link rel="stylesheet" href="../css/uix-icon.css" />
+	<link rel="stylesheet" href="../css/uix-extra.css" />
+
+
+	<link rel="stylesheet" href="../css/themes/default/uix-panel.css">
+	<link rel="stylesheet" href="../css/themes/default/uix-card.css">
+	<link rel="stylesheet" href="../css/themes/default/uix-window.css">
+	<link rel="stylesheet" href="../css/themes/default/uix-dialog.css">
+	<link rel="stylesheet" href="../css/themes/default/uix-scrollpane.css">
+
+
+	<link rel="stylesheet" href="css/custom.css">
+
+	<script src="../jquery-3.7.1.min.js"></script>
+	<!-- <script src="../dist/uix-all.min.js"></script> -->
+
+	<script src="../jquery-3.7.1.min.js"></script>
+	<script src="../src/plugins/uix-core.js"></script>
+	<script src="../src/plugins/uix-basic.js"></script>
+	<script src="../src/plugins/uix-element.js"></script>
+	<script src="../src/plugins/uix-panel.js"></script>
+	<script src="../src/plugins/uix-inline.js"></script>
+	<script src="../src/plugins/uix-spirit.js"></script>
+	<script src="../src/plugins/uix-button.js"></script>
+	<script src="../src/plugins/uix-card.js"></script>
+	<script src="../src/plugins/uix-draggable.js"></script>
+	<script src="../src/plugins/uix-resizable.js"></script>
+	<script src="../src/plugins/uix-scrollpane.js"></script>
+	<script src="../src/plugins/uix-window.js"></script>
+	<script src="../src/plugins/uix-dialog.js"></script>
+	<script src="../src/plugins/uix-input.js"></script>
+	<script src="../src/plugins/uix-textbox.js"></script>
+
+	<script>
+		//uix.Window.useTaskBar = true;
+
+		$(function () {
+			$("#dialog1").dialog({
+				width: "600px",
+				height: "300px",
+				title: "错误",
+				//modal:true,
+			});
+
+			$("#dialog2").dialog({
+				width: "600px",
+				height: "300px",
+				title: "警告",
+				buttons: [{
+					buttonText: "确定",
+					// cssClass: "btn btn-default",
+					onClick: () => {
+						console.log("ddddddddddddddddddddd");
+					}
+				}, {
+					buttonText: "取消",
+					// cssClass: "btn btn-danger",
+					onClick: () => {
+						console.log("fffffffffffffffffffffff");
+					}
+				}]
+			});
+
+
+			//$("#dialog2").dialog();
+			//$("#dialog2").dialog();
+			//$("#dialog2").dialog();
+
+
+
+
+
+
+			$("#btn1").click(function () {
+				$("#dialog1").dialog("open").then("center");
+
+			});
+
+			$("#btn2").click(function () {
+				$("#dialog2").dialog("open").then("center");
+
+			});
+
+			$("#btn5").click(() => {
+				$("#dialog1").dialog("close");
+			});
+
+			$("#btn6").click(() => {
+				uix.alert("提示", "错误，请联系管理员", () => {
+					console.log("ffffffff");
+					//return false;
+				});
+			});
+
+			$("#btn7").click(() => {
+				uix.confirm("确认", "确定要删除吗？", () => {
+					console.log("执行ajax删除");
+					//return false;
+				});
+			});
+
+			$("#btn8").click(() => {
+				uix.info('你好，这是一个提示消息');
+			});
+
+			$("#btn9").click(() => {
+				uix.open("修改学生", "<iframe src='05-button.html'>", 600, 300, () => {
+					console.log("提交");
+				}, () => {
+					console.log("取消");
+				});
+			});
+
+			$("#btn10").click(() => {
+				uix.prompt("输入", "请输入您的姓名", function (val) {
+					console.log(val);
+				})
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<div>
+		<button id="btn1" class="btn btn-default">打开对话框1</button>
+		<button id="btn2" class="btn btn-primary">打开对话框2</button>
+		<button id="btn3" class="btn btn-secondary">打开对话框3</button>
+		<button id="btn4" class="btn btn-success">打开对话框4</button>
+		<button id="btn5" class="btn btn-info">关闭所有</button>
+
+		<div id="btn6" class="btn btn-warning">alert</div>
+		<a href="#" id="btn7" class="btn btn-danger">confirm</a>
+		<b id="btn8" class="btn btn-default">info</b>
+
+
+		<div id="btn9" class="btn btn-warning">iframe</div>
+
+		<div id="btn10" class="btn btn-danger">输入对话框</div>
+	</div>
+
+
+	<div id="dialog1" class="dpn">
+		<h1>错误对话框内容</h1>
+	</div>
+
+
+	<div id="dialog2" class="dpn">
+		<h2>带按钮的对话框</h2>
+	</div>
+
+</body>
+
+</html>

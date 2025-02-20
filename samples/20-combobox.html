@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>ComboBox组件示例</title>
+
+    <link rel="stylesheet" href="../css/uix-reset.css">
+    <link rel="stylesheet" href="../css/uix-basic.css">
+    <link rel="stylesheet" href="../css/uix-utility.css">
+    <link rel="stylesheet" href="../css/uix-extra.css">
+    <link rel="stylesheet" href="../css/uix-icon.css" />
+
+    <link rel="stylesheet" href="../css/themes/default/uix-element.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-panel.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-window.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-scrollpane.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-combo.css">
+    <link rel="stylesheet" href="../css/themes/default/uix-combobox.css">
+
+    <link rel="stylesheet" href="css/custom.css">
+
+    <script src="../jquery-3.7.1.min.js"></script>
+    <script src="../src/plugins/uix-core.js"></script>
+    <script src="../src/plugins/uix-basic.js"></script>
+    <script src="../src/plugins/uix-element.js"></script>
+    <script src="../src/plugins/uix-panel.js"></script>
+    <script src="../src/plugins/uix-inline.js"></script>
+    <script src="../src/plugins/uix-spirit.js"></script>
+    <script src="../src/plugins/uix-button.js"></script>
+
+    <script src="../src/plugins/uix-card.js"></script>
+    <script src="../src/plugins/uix-draggable.js"></script>
+    <script src="../src/plugins/uix-resizable.js"></script>
+    <script src="../src/plugins/uix-window.js"></script>
+    <script src="../src/plugins/uix-dialog.js"></script>
+    <script src="../src/plugins/uix-input.js"></script>
+    <script src="../src/plugins/uix-textbox.js"></script>
+
+    <!-- 穿越组件 -->
+    <script src="../src/plugins/uix-penetrable.js"></script>
+
+    <script src="../src/plugins/uix-combo.js"></script>
+    <script src="../src/plugins/uix-combobox.js"></script>
+
+    <script>
+        $(function () {
+            $("#a3").combobox({
+                labelText: "方位：",
+                //labelWidth:"200px",
+                //labelAlign:"right",
+                width: "400px",
+                height: "40px",
+                prompt: "请选择方位",
+                panelWidth: "300px",
+                panelHeight: "350px",
+                mulitiple: true,
+                //panelHeader: {}
+            });
+
+
+            let data = [{
+                id: "001",
+                text: "春",
+                value: "spring"
+            }, {
+                id: "002",
+                text: "夏",
+                value: "sumber"
+            }, {
+                id: "003",
+                text: "秋",
+                value: "automn"
+            }, {
+                id: "004",
+                text: "冬",
+                value: "winter"
+            }];
+
+
+            $("#a3").combobox("setData", [{
+                name: "默认组",
+                children: data
+            }]).then("value", "automn");
+
+
+            $("#a3").combobox("setData", [{
+                name: "默认组",
+                children: data
+            }]);
+
+            //console.log($("#a3").combobox("value"));
+
+
+            $("#a1").combobox({
+                prompt: "请选择天干地支",
+                panelWidth: "300px",
+                panelHeight: "250px",
+                //panelHeader:{}
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+    <div>
+        <div id="a3"></div>
+    </div>
+
+
+    <div style="margin-top: 20px;">
+        <form action="">
+            <div>
+                <!-- <input type="text" id="a1" name="a1"> -->
+                <select id="a1" name="a1">
+                    <optgroup label="天干">
+                        <option value="1">甲</option>
+                        <option value="2">乙</option>
+                        <option value="3">丙</option>
+                        <option value="4">丁</option>
+                        <option value="5">戊</option>
+                    </optgroup>
+                    <optgroup label="地支">
+                        <option value="6">子</option>
+                        <option value="7">丑</option>
+                        <option value="8">寅</option>
+                        <option value="9">卯</option>
+                        <option value="10">辰</option>
+                    </optgroup>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <a href="#" id="btn1">设置值</a>
+        <select id="a2">
+            <optgroup label="aaa">
+                <option value="111">111</option>
+                <option value="222">222</option>
+            </optgroup>
+            <optgroup label="bbb">
+                <option value="333">333</option>
+                <option value="444">444</option>
+            </optgroup>
+        </select>
+    </div>
+</body>
+
+</html>

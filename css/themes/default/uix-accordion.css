@@ -1,0 +1,27 @@
+/* 面板收缩动画 */
+[data-comp-type=accordion]>[data-comp-type=card]>[data-comp-role~=body] {
+    transition: all .3s;
+    grid-template-rows: 1fr;
+}
+
+[data-comp-type=accordion]>[data-comp-type=card].collapsed>[data-comp-role~=body] {
+    /* height: 0; */
+    grid-template-rows: 0fr;
+}
+
+[data-comp-type=accordion]>[data-comp-type=card].collapsed {
+    border-bottom: none;
+}
+
+[data-comp-type=accordion].fits>[data-comp-type=card].collapsed {
+    flex-shrink: 0;
+}
+
+/* accordion设置了showType="fit"属性，表示面板会自动填充剩余所有空间 */
+[data-comp-type=accordion].fits>[data-comp-type=card]:not(.collapsed) {
+    height: 100%;
+}
+
+[data-comp-type=accordion].fits>[data-comp-type=card]:last-child:not(.collapsed) {
+    border-bottom: none;
+}

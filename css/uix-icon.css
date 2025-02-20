@@ -1,0 +1,134 @@
+/* 所有图标摘选自：https://iconify.design/，https://icon-sets.iconify.design/ */
+/* 改变图标颜色：https://www.zhangxinxu.com/wordpress/2018/11/css-change-icon-color/，https://www.zhangxinxu.com/sp/filter.html*/
+
+.ico-white {
+    filter: invert(91%) sepia(97%) saturate(7%) hue-rotate(132deg) brightness(107%) contrast(100%);
+}
+
+.ico-black {
+    filter: invert(0%) sepia(2%) saturate(7%) hue-rotate(322deg) brightness(97%) contrast(102%);
+}
+
+.ico-grey {
+    filter: invert(89%) sepia(0%) saturate(75%) hue-rotate(157deg) brightness(93%) contrast(91%);
+}
+
+/* card图标 */
+.iconify-card {
+    background-image: url('./images/maximize-48-filled.svg');
+}
+
+/* window图标 */
+.iconify-window {
+    background-image: url('./images/window.svg');
+}
+
+/* 窗口最大化 */
+.iconify-window-max {
+    background-image: url('./images/full-screen-maximize-20-regular.svg');
+}
+
+/* 窗口最小化 */
+.iconify-window-min {
+    background-image: url('./images/web-asset-20-regular.svg');
+}
+
+/* 窗口恢复大小 */
+.iconify-window-restore {
+    background-image: url('./images/square-multiple-20-regular.svg');
+}
+
+/* 窗口收缩 */
+.iconify-window-collapse {
+    background-image: url('./images/chevron-double-up-20-regular.svg');
+}
+
+/* 窗口展开 */
+.iconify-window-expand {
+    background-image: url('./images/chevron-double-down-20-regular.svg');
+}
+
+/* 窗口关闭 */
+.iconify-window-close {
+    background-image: url('./images/dismiss-square-24-regular.svg');
+}
+
+/* 左箭头 */
+.iconify-arrow-left {
+    background-image: url('./images/chevron-left-16-regular.svg?color=%23fff');
+}
+
+/* 右箭头 */
+.iconify-arrow-right {
+    background-image: url('./images/chevron-right-16-regular.svg?color=%23fff');
+}
+
+/* 左双箭头 */
+.iconify-arrow-double-left {
+    background-image: url("./images/keyboard-double-arrow-left.svg");
+}
+
+/* 右双箭头 */
+.iconify-arrow-double-right {
+    background-image: url('./images/keyboard-double-arrow-right.svg');
+}
+
+/* 左单箭头 */
+.iconify-arrow-single-left {
+    background-image: url("./images/chevron-left.svg");
+}
+
+/* 右单箭头 */
+.iconify-arrow-single-right {
+    background-image: url("./images/chevron-right.svg");
+}
+
+/* 眼睛挣开 */
+.iconify-eye-open {
+    background-image: url('./images/eye-20-regular.svg?color=%23666');
+}
+
+/* 眼睛关闭 */
+.iconify-eye-close {
+    background-image: url('./images/eye-20-filled.svg?color=%23666');
+}
+
+/* 下实心三角箭头 */
+.iconify-arrow-fill-down {
+    background-image: url('./images/menu-down.svg?color=%23666');
+}
+
+/* 上实心三角箭头 */
+.iconify-arrow-fill-up {
+    background-image: url('./images/menu-up.svg?color=%23666');
+}
+
+/* 方块加号 */
+.iconify-add-square {
+    background-image: url('./images/add-square-24-regular.svg?color=%23666');
+}
+
+/* 方块减号 */
+.iconify-subtract-square {
+    background-image: url('.images/fluent/subtract-square-24-regular.svg?color=%23666');
+}
+
+/* 文档 */
+.iconify-document {
+    background-image: url('./images/document-24-regular.svg?color=%23666');
+}
+
+/* 对号 */
+.iconify-check {
+    background-image: url('./images/check.svg?color=%235fb878');
+}
+
+/* 日历 */
+.iconify-calendar {
+    background-image: url("./images/calendar.svg");
+}
+
+/* 加载，刷新 */
+.iconify-reload {
+    background-image: url('./images/reload.svg');
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页</title>
+    <link rel="stylesheet" href="../../dist/css/uix-all.min.css">
+    <link rel="stylesheet" href="../../dist/css/themes/default/uix-theme.min.css">
+    <script src="../../jquery-3.7.1.min.js"></script>
+    <script src="../../dist/uix-all.min.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            background-color: var(--uix-grey-200);
+
+        }
+
+        .login {
+            width: 550px;
+            height: 350px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .login>.header {
+            height: 150px;
+            background: url(images/login.jpg) no-repeat center center/cover;
+        }
+
+        form>div {
+            margin-top: 10px;
+        }
+
+        form>div>label {
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+        }
+
+        form #submit {
+            padding: 8px 20px;
+        }
+    </style>
+    <script>
+        $(() => {
+            $("#username").textbox({
+                width: 340,
+                height: 33
+            });
+            $("#password").passwordbox({
+                width: 340,
+                height: 33
+            });
+
+            $("#submit").button({
+                onClick: function () {
+                    let username = $("#username").textbox("value");
+                    let password = $("#password").passwordbox("value");
+
+                    console.log(username, password);
+
+                    let data = uix.buildFormData($("form"));
+                    console.log(data);
+                }
+            });
+        });
+    </script>
+</head>
+
+<body class="dpf fcc">
+    <div class="login">
+        <div class="header"></div>
+        <div class="body">
+            <form class="light-form" action="">
+                <div>
+                    <label for="username">用户名：</label>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div>
+                    <label for="password">密码：</label>
+                    <input type="password" id="password" name="password" autocomplete="off">
+                </div>
+                <div>
+                    <label for=""></label>
+                    <button type="button" id="submit" class="btn btn-primary">登录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

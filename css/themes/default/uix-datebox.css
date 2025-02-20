@@ -1,0 +1,9 @@
+[data-comp-type=datebox]>[data-comp-role~=dropdown-panel]>[data-comp-role~=body]>[data-comp-role~=footer] {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+[data-comp-type=datebox] [data-comp-role~=dropdown-switch]>[data-comp-role~=si] {
+    transform: unset;
+}
