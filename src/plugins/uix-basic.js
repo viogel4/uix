@@ -1,7 +1,7 @@
 (function ($) {
-	const DOM_REF_KEY = "##uix-dom-ref";//作为dom引用的key
+	const DOM_REF_KEY = "uix-dom-ref";//作为dom引用的key
 
-	//秉承随机组件id
+	//生成随机组件id
 	uix.compId = function (length = 6) {
 		return uix.id(length, "uix-");
 	};
@@ -34,7 +34,7 @@
 
 	//创建组件配置项对象
 	uix.compOptions = function (dom, compType, options) {
-		let state = $.data(uix.getRef(dom), "comp-state");//考虑到dom有可能已经不是comp组件，所以此处并未转换成comp组件，再获取配置项
+		let state = $.data(uix.getRef(dom), "comp-state");//考虑到dom有可能不是comp组件，所以此处并未转换成comp组件，再获取配置项
 		let opts;
 
 		if (state) {
@@ -46,24 +46,22 @@
 	};
 
 	//设置dom引用，dom可以是jquery对象，dom对象，或者jquery选择器
-	//refDom的类型是dom
+	//refDom的类型是纯dom
 	uix.setRef = function (dom, refDom) {
 		return $(dom).each((_, it) => $.data(it, DOM_REF_KEY, refDom));
 	}
 
 	//获取指定dom的引用dom，递归查找，若没有引用dom，则返回自身
 	uix.getRef = function (dom) {
-		let domSrc = dom;
-
 		while (true) {
-			let domRef = $.data(domSrc, DOM_REF_KEY); //获取dom元素的引用元素
+			let domRef = $.data(dom, DOM_REF_KEY); //获取dom元素的引用元素
 			if (domRef) {
-				domSrc = domRef;
+				dom = domRef;
 			} else {
 				break;
 			}
 		}
-		return domSrc;
+		return dom;
 	}
 
 	//移除指定dom的引用dom对象
