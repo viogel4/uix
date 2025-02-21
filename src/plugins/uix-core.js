@@ -221,18 +221,17 @@
 		isValid: v => !(uix.isNotValid(v)),
 		isNotValid: v => v === undefined || v === null,
 
-		//不可用，或者值为空字符串
+		//不可用，或者值为空字符串，参数必须是字符串
 		isEmpty: v => uix.isNotValid(v) || v === "",
 		isNotEmpty: v => !(uix.isEmpty(v)),
 
-		//不可用，或者值为空白
+		//不可用，或者值为空白，参数必须是字符串
 		isBlank: v => uix.isEmpty(v) || v.trim() === "",
 		isNotBlank: v => !(uix.isBlank(v)),
 
 		//是否普通对象
 		isObject(obj) {
-			return $.isPlainObject(obj);
-			//return Object.prototype.toString.call(obj) === "[object Object]";
+			return Object.prototype.toString.call(obj) === "[object Object]";
 		},
 		//是否数组
 		isArray(arr) {

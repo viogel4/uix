@@ -6,30 +6,48 @@
 		return uix.id(length, "uix-");
 	};
 
-	//可以自动解析class和style的extend，扩展自jquery的extend，递归对opts下的cssStyle和cssClass属性进行parse操作
-	uix.options = (target, ...options) => {
-		deepParse(target, true);
-
-		options.forEach(it => deepParse(it, true));
-
-		//嵌套函数，递归解析
-		function deepParse(obj, isOpts) {
-			if (isOpts) {
-				uix.parseAll(obj);
+	//解析一个options对象的style和class
+	function parseOptions(cssObject, classKey = "cssClass", styleKey = "cssStyle") {
+		if (uix.isObject(cssObject)) {
+			if (uix.isNotBlank(classKey)) {
+				uix.parseClass(cssObject, classKey);//会直接修改cssObject对象
 			}
+			if (uix.isNotBlank(styleKey)) {
+				uix.parseStyle(cssObject, styleKey);//会直接修改cssObject对象
+			}
+			return cssObject;
+		} else {
+			throw new Error("参数必须是对象");
+		}
+	}
 
-			for (let name in obj) {
-				if (name === "cssClass" || name === "cssStyle") {
-					continue;
-				}
+	//递归解析
+	function parseOptionsAll(cssObject) {
+		//先解析自身
+		parseOptions(cssObject);
 
-				if (uix.isObject(obj[name]) || uix.isArray(obj[name])) {
-					deepParse(obj[name], name === "opts");
-				}
+		//再递归解析子对象
+		for (let name in cssObject) {
+			if (uix.isObject(obj[name])) {
+				parseOptionsAll(obj[name]);
 			}
 		}
+	}
 
-		return $.extend(true, target, ...options);
+	//可以自动解析cssClass和cssStyle的extend，扩展自jquery的extend，递归对opts下的cssStyle和cssClass属性进行parse操作
+	//此操作会改变第一个参数，如果不想改变第一个参数，可将第一个参数设置为空对象"{}"。
+	uix.options = (target, ...options) => {
+		//先解析第一个参数，此参数会改变
+		parseOptionsAll(target);
+
+		let optsArr = [];
+		options.forEach(it => {
+			let opts = $.extend(true, {}, it);//深度复制一个新对象，从而不改变原对象
+			parseOptionsAll(opts);
+			optsArr.push(opts);
+		});
+
+		return $.extend(true, target, ...optsArr);
 	};
 
 	//创建组件配置项对象
@@ -47,8 +65,8 @@
 
 	//设置dom引用，dom可以是jquery对象，dom对象，或者jquery选择器
 	//refDom的类型是纯dom
-	uix.setRef = function (dom, refDom) {
-		return $(dom).each((_, it) => $.data(it, DOM_REF_KEY, refDom));
+	uix.setRef = function (dom, domRef) {
+		return $(dom).each((_, it) => $.data(it, DOM_REF_KEY, domRef));
 	}
 
 	//获取指定dom的引用dom，递归查找，若没有引用dom，则返回自身
@@ -70,6 +88,7 @@
 		$.removeData(dom, DOM_REF_KEY);
 	}
 
+	//todo
 	//递归对dom对象的每一个引用执行指定的操作
 	uix.forEachRef = function (dom, cb) {
 		act(dom);
@@ -81,7 +100,7 @@
 				cb.call(domRef, domRef);
 			}
 		}
-	}
+	};
 
 	//根据指定的参数中的第一个元素获取组件，若获取不到，返回null。obj可以是选择器，可以是jquery对象，可以是dom对象
 	uix.compBy = function (obj) {
