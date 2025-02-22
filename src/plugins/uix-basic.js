@@ -9,27 +9,31 @@
 	//解析一个options对象的style和class
 	function parseOptions(cssObject, classKey = "cssClass", styleKey = "cssStyle") {
 		if (uix.isObject(cssObject)) {
-			if (uix.isNotBlank(classKey)) {
+			if (uix.isString(classKey) && uix.isNotBlank(classKey)) {
 				uix.parseClass(cssObject, classKey);//会直接修改cssObject对象
 			}
-			if (uix.isNotBlank(styleKey)) {
+			if (uix.isString(styleKey) && uix.isNotBlank(styleKey)) {
 				uix.parseStyle(cssObject, styleKey);//会直接修改cssObject对象
 			}
 			return cssObject;
 		} else {
-			throw new Error("参数必须是对象");
+			console.log("参数必须是对象");
 		}
 	}
 
-	//递归解析
+	//递归解析，会改变源对象
 	function parseOptionsAll(cssObject) {
-		//先解析自身
-		parseOptions(cssObject);
+		if (uix.isObject(cssObject) && Object.keys(cssObject) > 0) {
+			//先解析自身。注意：会改变参数对象
+			parseOptions(cssObject);
 
-		//再递归解析子对象
-		for (let name in cssObject) {
-			if (uix.isObject(obj[name])) {
-				parseOptionsAll(obj[name]);
+			//再递归解析子对象
+			for (let name in cssObject) {
+				let obj = cssObject[name];
+				if (uix.isObject(obj) && Object.keys(obj) > 0) {
+					//递归解析
+					parseOptionsAll(obj);
+				}
 			}
 		}
 	}
@@ -42,7 +46,9 @@
 
 		let optsArr = [];
 		options.forEach(it => {
-			let opts = $.extend(true, {}, it);//深度复制一个新对象，从而不改变原对象
+			//深度复制一个新对象，从而不改变原对象
+			let opts = $.extend(true, {}, it);
+			//进行style和class属性解析
 			parseOptionsAll(opts);
 			optsArr.push(opts);
 		});
@@ -58,7 +64,7 @@
 		if (state) {
 			opts = uix.options(state.options, options);//在旧配置项上合并新的配置
 		} else {
-			opts = uix.options({}, $.fn[compType].defaults, options);//初始化创建一个全新配置
+			opts = uix.options({}, uix.fn[compType].defaults, options);//初始化创建一个全新配置
 		}
 		return opts;
 	};
@@ -67,7 +73,7 @@
 	//refDom的类型是纯dom
 	uix.setRef = function (dom, domRef) {
 		return $(dom).each((_, it) => $.data(it, DOM_REF_KEY, domRef));
-	}
+	};
 
 	//获取指定dom的引用dom，递归查找，若没有引用dom，则返回自身
 	uix.getRef = function (dom) {
@@ -80,32 +86,28 @@
 			}
 		}
 		return dom;
-	}
+	};
 
-	//移除指定dom的引用dom对象
+	//移除指定dom自身的引用dom对象，不进行递归查找，只删除自身
 	uix.removeRef = function (dom) {
 		uix.setRef(dom, null);
 		$.removeData(dom, DOM_REF_KEY);
-	}
-
-	//todo
-	//递归对dom对象的每一个引用执行指定的操作
-	uix.forEachRef = function (dom, cb) {
-		act(dom);
-
-		function act(dom) {
-			let domRef = $.data(dom, DOM_REF_KEY); //获取dom元素的引用dom
-			if (domRef) {
-				act(domRef);
-				cb.call(domRef, domRef);
-			}
-		}
 	};
 
-	//根据指定的参数中的第一个元素获取组件，若获取不到，返回null。obj可以是选择器，可以是jquery对象，可以是dom对象
+	//级联删除dom引用，进行递归查询
+	uix.removeRefAll = function (dom) {
+		let domRef = $.data(dom, DOM_REF_KEY);
+		if (domRef) {
+			uix.removeRefAll(domRef);
+		}
+		uix.removeRef(dom);
+	};
+
+	//根据指定的参数中的第一个元素获取uix组件，若获取不到，返回false。obj可以是选择器，可以是jquery对象，可以是dom对象
 	uix.compBy = function (obj) {
-		let dom = $(obj).get(0);//仅获取第一个元素
+		let dom = $(obj).get(0);//获取第一个dom元素
 		if (uix.isValid(dom)) {
+			//获取dom引用
 			let domRef = uix.getRef(dom);
 			let state = $.data(domRef, "comp-state");
 			if (state) {
@@ -115,10 +117,68 @@
 		return false;
 	};
 
-	//根据comp-id，获取首个匹配组件对象
+	//根据comp-id，获取首个匹配uix组件
 	uix.compById = function (compId, win = window) {
 		let $jq = $("[data-comp-id=" + compId + "]", win.document);
 		return uix.compBy($jq);
+	};
+
+	//向祖先方向查找离当前元素最近指定类型的组件，不包括自身
+	uix.closestComp = function (child, type = "Element") {
+		let $jq = $(child).parent();
+		while (true) {
+			if ($jq.length === 0 || $jq.is("body")) {
+				break;
+			}
+
+			let comp = uix.compBy($jq);
+			if (comp instanceof uix[type]) {
+				return comp;
+			}
+
+			$jq = $jq.parent();
+		}
+		return false;
+	}
+
+	//调用组件方法或创建组件实例。参数constructor即组件的类型，如Element，同时也是构造函数
+	//此方法返回uix对象
+	uix.make = function (uixInst, constructor, options, ...params) {
+		let compType = constructor.name.toLowerCase();//组件类型字符串，是组件构造函数的首字母小写形式
+
+		if (uix.isString(options)) {//若options是字符串，表示调用组件方法，options即方法名
+			let method = uix.fn[compType].methods[options];//组件对外开放的可通过uix对象调用的方法
+			if (uix.isFunc(method)) {
+				return method(uixInst, ...params);
+			} else {//如果不是对外开放函数，则从组件内部去获取方法
+				method = constructor.prototype[options];
+				if (uix.isFunc(method)) {//如果存在，则直接调用组件内部的方法
+					return uixInst.jq().comps().map(it => method.call(it, ...params));
+				} else {
+					let pc = constructor.prototype.__proto__.constructor;//父类构造函数
+					if (pc !== Object) {
+						return uix.make(uixInst, pc, options, ...params);
+					}
+				}
+			}
+		} else {//否则表示创建uix组件实例
+			options = options || {};
+			uixInst.jq().each(function () {
+				//创建组件配置项
+				let opts = uix.compOptions(this, compType, options);
+				//每次调用时会重建对象，会继承合并之前的配置
+				let comp = Reflect.construct(constructor, [this, opts]);
+				//手动执行渲染
+				comp.render();
+			});
+			return uixInst;
+		}
+	};
+
+	//获取某dom元素当前所在的window
+	uix.frameWindow = function (dom) {
+		let doc = dom.ownerDocument || dom;
+		return doc.defaultView || doc.parentWindow;
 	};
 
 	//将jquery对象转换为uix组件，仅对jquery对象中的第一个元素进行处理
@@ -126,88 +186,10 @@
 		return uix.compBy(this);
 	};
 
-	//获取所有组件，返回组件数组
+	//获取所有组件，返回uix组件数组
 	$.fn.comps = function () {
 		return Array.prototype.map.call(this, it => $(it).asComp()).filter(it => it !== false);
 	}
-
-	//遍历每一个组件，执行指定的操作。如果是uix组件，则调用回调函数cb，否则忽略
-	//若有返回值，则仅返回第一个调用的返回值。注意：第一个参数是jquery对象
-	uix.each = function ($jq, cb) {
-		if (!uix.isJQuery($jq)) {
-			throw new Error("第一个参数必须是jquery对象");
-		}
-
-		let stream = $($jq).comps().map(it => cb(it));
-		return stream.length > 0 ? stream[0] : null;
-	};
-
-	//向祖先方向查找离当前元素最近的组件
-	uix.closestComp = function (child, type = "Element") {
-		let $parent = $(child);
-		while (true) {
-			if ($parent.length === 0 || $parent.is("body")) {
-				break;
-			}
-
-			let comp = uix.compBy($parent);
-			if (comp instanceof uix[type]) {
-				return comp;
-			}
-
-			$parent = $parent.parent();
-		}
-		return null;
-	}
-
-	//查询最近的祖先窗口组件
-	uix.closestWindow = function (child) {
-		return uix.closestComp(child, "Window");
-	}
-
-	//调用组件方法或创建组件实例。参数constructor即组件的类型，如Element，同时也是构造函数
-	uix.make = function ($jq, constructor, options, ...params) {
-		let compType = constructor.name.toLowerCase();//组件类型字符串，是组件构造函数的首字母小写格式
-
-		if (uix.isString(options)) {//options是字符串，表示调用组件方法
-			let method = $.fn[compType].methods[options];//组件对外公布的可通过jquery对象调用的方法
-			if (uix.isFunc(method)) {
-				return method($jq, ...params);
-			} else {//如果不是函数，则从组件内部去获取方法
-				method = constructor.prototype[options];
-				if (uix.isFunc(method)) {//如果能找到，直接调用组件内部的方法
-					return uix.each($jq, it => method.call(it, ...params));
-				} else {
-					let pc = constructor.prototype.__proto__.constructor;//父类构造函数
-					if (pc !== Object) {
-						return uix.make($jq, pc, options, ...params);
-					} else {
-						throw new Error("目标方法不存在");
-					}
-				}
-			}
-		} else {//表示创建组件实例
-			options = options || {};
-
-			return $jq.each(function () {
-				let opts = uix.compOptions(this, compType, options);
-
-				//每次会重建对象，重建对象时，会继承之前的配置
-				let elem = Reflect.construct(constructor, [this, opts]);
-				elem.render(); //手动执行渲染
-			});
-		}
-	};
-
-	//获取某dom元素当前所在的window。第2个参数findPenetrable表示，是否获取元素穿越之后穿越元素所在的window
-	uix.windowOf = function (dom, findPenetrable = false) {
-		if (findPenetrable) {
-			return $.data(dom, "comp-window") || uix.windowOf(uix.getRef(dom));
-		}
-
-		let doc = dom.ownerDocument || dom;
-		return doc.defaultView || doc.parentWindow;
-	};
 
 	/**
 	 * 赋予dom元素某项能力，并指定配置项
@@ -230,42 +212,12 @@
 		return $(this).each((_, t) => $(t)[ability](options));
 	};
 
-	//检查dom组件，是否拥有其中某一个角色
-	uix.hasAnyRole = (dom, roles) => {
-		let trs = $(dom).asComp().getRoles();
-		return roles.some(r => trs.includes(r));
-	};
-
-	//检查dom组件，是否拥有指定的全部角色
-	uix.hasAllRoles = (dom, roles) => {
-		let trs = $(dom).asComp().getRoles();
-		return roles.every(r => trs.includes(r))
-	};
-
-	//查找拥有某个角色的组件，返回组件数组
-	uix.compsByRole = ($jq, role) => $($jq).comps().filter(it => it.hasRole(role));
-
-	//组件的链式函数调用，通过jquery对象连续调用
-	$.fn.and = function (...params) {
-		return $(this).each(function () {
-			let type = $(this).asComp().getCompType();
-			$(this)[type](...params);
-		});
-	};
-
-	//断言某个对象obj是否某个指定的类型，types为不定长参数
-	uix.isTypeOf = (obj, ...types) => {
-		return types.some(it => {
-			if (uix.isString(it)) {
-				let t = uix[it];
-				if (t) {
-					return obj instanceof t;
-				} else {
-					return obj instanceof window[it];
-				}
-			} else {
-				return obj instanceof it;
-			}
+	//uix组件的链式函数调用，通过uix对象连续调用
+	uix.fn.and = function (...params) {
+		return this.forEach(d => {
+			//获取组件类型
+			let type = $(d).asComp().getCompType();
+			uix(d)[type](...params);
 		});
 	};
 

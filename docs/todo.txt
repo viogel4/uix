@@ -1,6 +1,19 @@
 
+已完成
+core,basic,element.js,draggable.js,resizable.js,window.js
+01-element.html
+
+
 todo:
-uix.basic.js中的uix.options方法重构，尽量不要更改目标参数对象。考虑$.extend({},a);
+07-window.html未测试完，未实现可最大化，最小化，可关闭的窗口。
+
+
+dialog.js未完成
+
+basic.js中的uix.info等等未完成。
+
+
+penetrable.js穿越组件未完成重构，重构成uix调用的形式。
 2025-02-20
 
 
@@ -11,124 +24,11 @@ uix.basic.js中的uix.options方法重构，尽量不要更改目标参数对象
 
 
 =============================================================================
-uix-2023
-最后更新：2023-11-14
-初期先实现功能，不要过分强调性能。后期再优化，重构，不要陷入过度设计，而导致进展缓慢。
+
 ==========================================================================
-todo:
 1.根据easyui的组件功能及源码，补充完善uix组件功能。
-2.根据extjs的组件功能，补充完善uix组件功能。
-3.支持类型图片（info,warn,error）的alert。
-5.windows的任务栏z-index层级要么比所有窗口都小，要么比所有窗口都大。
-6.所有组件，除了element组件之外，全部重构为不再依赖jquery，不使用jquery对象，仅调用element组件的函数
-
-
-7.datagrid:暂不支持fitColumns属性，暂无好的办法，当表格设置为宽度100%后（超出列自定义的宽度）时，列自定义的宽度将
-失效。https://blog.csdn.net/weixin_42178670/article/details/125636921
-8.datagrid如果每次显示100行，则性能比较慢。
-9.封装table组件。方便datagrid调用。否则一个datagrid用到多个table时，会非常麻烦
-30.calendar:上一月，下一月，上一年，下一年事件。
-点击年月切换显示面板。
-31.databox:
-选中日期绿色高亮显示，在没有选中值时，则默认当前日期绿色。
-35.pagination：goto组件变成numberspinner
-36.手风琴组件添加展开与折叠动画。
-
-34.datagrid
-头部工具栏和尾部工具栏。改为自定义，而不是hard code。
-
-每一行，可以有自己的弹出详情，自定义点击图标。
-可根据pagination：true控制datagrid是否显示分页组件。
-
-
-46.手风琴面板组件，折叠与打开动画。body内容超出滚动条。
-
-
-38.tabs选项卡组件。
-39.表单组件，表单元素组件。
-40.table组件。
-41.datagrid组件。
-
-45.tree组件，树面板
-
-49.DateBox日期单元格点击事件未完成。
-
-
-
-48.calendar组件未完成，显示时间面板
-
-
-
-
-3.表单。
-1.filebox：支持单图，多图，缩略预览
-
-switch slider
-
-2.combogrid
-3.combotree
-4.comboeditor
-
-6.datetimebox
-7.timebox
-
-
-spinner:微调器
-1.numberspinner
-2.datespinner：最多三个numberspinner
-3.timespinner：最多三个numberspinner
-4.datetimespinner:最多六个numberspinner
-
-
-13.Menu组件（尚未存在），二级子菜单的，添加右箭头图标，弹出Dialog，显示另一个Menu。
-
-
-24.datagrid：
-setChecked([]) ：复选框选中
-getChecked() : 返回数组，复选框选中
-
-setSelected([]):设置多个元素选中，点击选中
-getSelected:返回选中的多个元素，点击选中。
-
-
-28.form组件：validate()
-opts:{
-  include:[],
-  exclude:[],
-  handler:{
-    "#username":{
-      
-    }
-  }
-}
-
-
-=====================================================================================================
-60.扩展插件：不开源，有偿提供。
-颜色选择插件：ColorPicker/colorbox。
-虚拟键盘插件：VirutalKeyboardBox
-安全密码输入插件：SecurityPasswordBox
-阴历插件（万年历插件）：
-下拉菜单插件：
-透视图插件：
-Excel表格编辑插件：支持公式
-velocity动画插件：
-批量新增/修改插件：
-mock插件：
-各种皮肤（theme/xxx.css）：春夏秋冬四季皮肤（使用excel日历图片），梅兰竹菊皮肤，甘十九妹皮肤
-各种风格后台管理界面
 
 
 ==============================================================================================================
 目标与特点：
-1.优先支持js对象的调用方式，同时兼容支持easyui式的调用方式"$("aaa").xxx("methodName",args);"，但后者就是调用前者。
-2.优先通过继承体系，实现方法和属性的组合应用
-3.优先使用组合创建组件，而不是继承
-4.几乎所有组件无需组合，每个组件几乎都是独立的
-5.1.0.x版本首要目标，不在乎生成大小。
-6.1.1.x目标：精简并优化大小。
-
-
-2.所有插件，允许完全自由的客户定制。
-3.所有插件由html结构，css，及行为所组成。行为可通过插件的静态方法手动赋予。
-如uix.assignAbility($("aaa"),"dragable",{options})
+1.

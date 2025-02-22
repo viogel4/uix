@@ -13,14 +13,14 @@
 	<!-- 皮肤css -->
 	<link rel="stylesheet" href="../css/themes/default/uix-element.css">
 	<link rel="stylesheet" href="css/custom.css">
-	<script src="../jquery-3.7.1.min.js"></script>
+	<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
 	<script src="../src/plugins/uix-core.js"></script>
 	<script src="../src/plugins/uix-basic.js"></script>
 	<script src="../src/plugins/uix-element.js"></script>
 
 	<script>
 		$(() => {
-			$("#a1").element({
+			uix("#a1").element({
 				cssStyle: {
 					width: "100px",
 					height: "100px",
@@ -35,12 +35,9 @@
 
 			//and方法定义在basic.js中，表示组件函数的连续调用，and函数可以替换成element函数
 			//////////////////////////////////////////
-
 			$("#a1").click(function () {
 				$(this).width(300);
 			});
-
-
 		});
 	</script>
 	<style>

@@ -1,4 +1,4 @@
-(function($) {
+(function ($) {
 	function resize(e) {
 		let resizeData = e.data;
 		let options = $.data(resizeData.target, "resizable").options;
@@ -64,7 +64,7 @@
 	}
 
 	function doDown(e) {
-		$.fn.resizable.isResizing = true;
+		uix.fn.resizable.isResizing = true;
 		$.data(e.data.target, "resizable").options.onStartResize.call(e.data.target, e);
 		return false;
 	}
@@ -78,7 +78,7 @@
 	}
 
 	function doUp(e) {
-		$.fn.resizable.isResizing = false;
+		uix.fn.resizable.isResizing = false;
 		resize(e, true);
 		applySize(e);
 		$.data(e.data.target, "resizable").options.onStopResize.call(e.data.target, e);
@@ -89,7 +89,7 @@
 
 	// get the resize direction
 	function getDirection(e) {
-		let opts = $(e.data.target).resizable("options");
+		let opts = uix(e.data.target).resizable("options");
 		let tt = $(e.data.target);
 		let dir = "";
 		let offset = tt.offset();
@@ -109,7 +109,7 @@
 		}
 
 		let handles = opts.handles.split(",");
-		handles = $.map(handles, function(h) {
+		handles = $.map(handles, function (h) {
 			return $.trim(h).toLowerCase();
 		});
 
@@ -126,19 +126,21 @@
 		return "";
 	}
 
-	$.fn.resizable = function(options, params) {
+	uix.fn.resizable = function (options, params) {
 		if (typeof options === "string") {
-			return $.fn.resizable.methods[options](this, params);
+			return uix.fn.resizable.methods[options](this, params);
 		}
 
-		return $(this).each(function() {
+		let $jq = this.jq();
+
+		$jq.each(function () {
 			let opts = null;
 			let state = $.data(this, "resizable");
 			if (state) {
 				$(this).off(".resizable");
 				opts = $.extend(state.options, options || {});
 			} else {
-				opts = $.extend(true, {}, $.fn.resizable.defaults, options || {});
+				opts = $.extend(true, {}, uix.fn.resizable.defaults, options || {});
 				$.data(this, "resizable", {
 					options: opts
 				});
@@ -150,19 +152,19 @@
 
 			$(this).on("mousemove.resizable", {
 				target: this
-			}, function(e) {
-				if ($.fn.resizable.isResizing) {
+			}, function (e) {
+				if (uix.fn.resizable.isResizing) {
 					return;
 				}
 				let dir = getDirection(e);
 				$(e.data.target).css("cursor", dir ? dir + "-resize" : "");
 			}).on("mouseleave.resizable", {
 				target: this
-			}, function(e) {
+			}, function (e) {
 				$(e.data.target).css("cursor", "");
 			}).on("mousedown.resizable", {
 				target: this
-			}, function(e) {
+			}, function (e) {
 				let dir = getDirection(e);
 				if (dir === '') {
 					return;
@@ -200,29 +202,31 @@
 				$("body").css("cursor", dir + "-resize");
 			});
 		});
+
+		return this;
 	};
 
-	$.fn.resizable.methods = {
-		options: function($jq) {
-			return $.data($jq[0], "resizable").options;
+	uix.fn.resizable.methods = {
+		options: function (t) {
+			return $.data(t.jq()[0], "resizable").options;
 		},
-		enable: function($jq) {
-			return $jq.each(function() {
-				$(this).resizable({
+		enable: function (t) {
+			return t.forEach(function (d) {
+				$(d).resizable({
 					disabled: false
 				});
 			});
 		},
-		disable: function($jq) {
-			return $jq.each(function() {
-				$(this).resizable({
+		disable: function (t) {
+			return t.forEach(function (d) {
+				$(d).resizable({
 					disabled: true
 				});
 			});
 		}
 	};
 
-	$.fn.resizable.defaults = {
+	uix.fn.resizable.defaults = {
 		disabled: false,
 		handles: "n, e, s, w, ne, se, sw, nw, all",
 		minWidth: 10,
@@ -230,11 +234,11 @@
 		maxWidth: () => $(window).width(),
 		maxHeight: () => $(window).height(),
 		edge: 5,
-		onStartResize: function(e) {},
-		onResize: function(e) {},
-		onStopResize: function(e) {}
+		onStartResize: function (e) { },
+		onResize: function (e) { },
+		onStopResize: function (e) { }
 	};
 
-	$.fn.resizable.isResizing = false;
+	uix.fn.resizable.isResizing = false;
 
 })(jQuery);

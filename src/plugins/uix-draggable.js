@@ -188,12 +188,14 @@
 	/**
 	 * draggable是一项能力，而非一个组件
 	 */
-	$.fn.draggable = function (options, params) {
+	uix.fn.draggable = function (options, params) {
 		if (typeof options === 'string') {
-			return $.fn.draggable.methods[options](this, params);
+			return uix.fn.draggable.methods[options](this, params);
 		}
 
-		return $(this).each(function () {
+		let $jq = this.jq();//this为uix对象
+
+		$jq.each(function () {
 			let opts;
 			let state = $.data(this, "draggable"); //draggable是一项能力，而非一个组件，其存储状态的方式与组件存储状态方式不冲突
 
@@ -201,7 +203,7 @@
 				state.handle.off(".draggable"); //重点，先卸载事件
 				opts = $.extend(state.options, options);
 			} else {
-				opts = $.extend({}, $.fn.draggable.defaults, options || {});
+				opts = $.extend({}, uix.fn.draggable.defaults, options || {});
 			}
 
 			//拖动柄
@@ -220,7 +222,7 @@
 			}
 
 			//获取组件穿越后所在的window，如果未穿越，则返回当前window
-			let win = uix.windowOf(this, true);
+			let win = uix.frameWindow(this, true);
 			if (uix.isValid(opts.window)) {
 				win = opts.window;
 			}
@@ -326,32 +328,34 @@
 				return Math.min(t, r, b, l) > state.options.edge;
 			}
 		});
+
+		return this;
 	};
 
-	$.fn.draggable.methods = {
-		options: function ($jq) {
-			return $.data($jq[0], "draggable").options;
+	uix.fn.draggable.methods = {
+		options: function (t) {
+			return $.data(t.jq()[0], "draggable").options;
 		},
-		proxy: function ($jq) {
-			return $.data($jq[0], "draggable").proxy;
+		proxy: function (t) {
+			return $.data(t.jq()[0], "draggable").proxy;
 		},
-		enable: function ($jq) {
-			return $jq.each(function () {
-				$(this).draggable({
+		enable: function (t) {
+			return t.forEach(function (d) {
+				$(d).draggable({
 					disabled: false
 				});
 			});
 		},
-		disable: function ($jq) {
-			return $jq.each(function () {
-				$(this).draggable({
+		disable: function (t) {
+			return t.forEach(function (d) {
+				$(d).draggable({
 					disabled: true
 				});
 			});
 		}
 	};
 
-	$.fn.draggable.defaults = {
+	uix.fn.draggable.defaults = {
 		proxy: null,
 		revert: false,
 		cursor: 'move',
@@ -364,14 +368,14 @@
 		axis: null,
 		delay: 100,//延时触发鼠标按下事件
 
-		onBeforeDrag: function (e) { },
-		onStartDrag: function (e) { },
-		onDrag: function (e) { },//持续触发
-		onEndDrag: function (e) { },
-		onStopDrag: function (e) { },
+		onBeforeDrag: $.noop,
+		onStartDrag: $.noop,
+		onDrag: $.noop,//持续触发
+		onEndDrag: $.noop,
+		onStopDrag: $.noop,
 		window
 	};
 
-	$.fn.draggable.isDragging = false;
+	uix.fn.draggable.isDragging = false;
 
 })(jQuery);

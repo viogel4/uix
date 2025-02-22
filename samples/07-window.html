@@ -12,33 +12,23 @@
 	<link rel="stylesheet" href="../css/uix-icon.css" />
 	<link rel="stylesheet" href="../css/uix-extra.css" />
 
-
-	<link rel="stylesheet" href="../css/themes/default/uix-panel.css">
-	<link rel="stylesheet" href="../css/themes/default/uix-card.css">
 	<link rel="stylesheet" href="../css/themes/default/uix-window.css">
-	<link rel="stylesheet" href="../css/themes/default/uix-scrollpane.css">
 
 	<link rel="stylesheet" href="css/custom.css">
 
-	<script src="../jquery-3.7.1.min.js"></script>
+	<script src="../lib/jquery/jquery-3.7.1.min.js"></script>
 	<script src="../src/plugins/uix-core.js"></script>
 	<script src="../src/plugins/uix-basic.js"></script>
 	<script src="../src/plugins/uix-element.js"></script>
-	<script src="../src/plugins/uix-panel.js"></script>
-	<script src="../src/plugins/uix-inline.js"></script>
-	<script src="../src/plugins/uix-spirit.js"></script>
-	<script src="../src/plugins/uix-button.js"></script>
-	<script src="../src/plugins/uix-card.js"></script>
 	<script src="../src/plugins/uix-draggable.js"></script>
 	<script src="../src/plugins/uix-resizable.js"></script>
-	<script src="../src/plugins/uix-scrollpane.js"></script>
 	<script src="../src/plugins/uix-window.js"></script>
 
 	<script>
 		uix.Window.useTaskBar = true;
 
 		$(function () {
-			$("#a1").window({
+			uix("#a1").window({
 				width: "600px",
 				height: "300px",
 				title: "添加",
@@ -95,18 +85,14 @@
 			}); */
 
 
-			$("#open").button({
-				onClick: function () {
-					$("#a1").window("open");
-				}
+			uix("#open").element().element("click", function () {
+				uix("#a1").window("open");
 			});
 
-			$("#close").button({
-				onClick: () => $("#a1").window("close")
-			});
+			uix("#close").element().element("click", () => uix("#a1").window("close"));
 
 			$("#open2").click(() => {
-				$("#a2").window({
+				uix("#a2").window({
 					width: "600px",
 					height: "300px",
 					title: "修改",
@@ -116,7 +102,7 @@
 				}).window("open");
 			});
 
-			$("#center").click(() => $("#a1").window("center"));
+			$("#center").click(() => uix("#a1").window("center"));
 
 			$("#test").click(function () {
 				let w = $("#a1").asComp();
@@ -142,7 +128,7 @@
 	<div id="a1" class="dpn">
 		<h1>卡片内容</h1>
 	</div>
-	<div id="a2" class="dpn"></div>
+	<div id="a2" class="dpn">321321321321</div>
 	<div id="a3" class="dpn"></div>
 
 
