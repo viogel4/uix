@@ -211,7 +211,7 @@
 			$(this.getTarget()).remove();
 
 			//销毁附属组件
-			this.getLiveFor().element("destroy");
+			uix(this.getLiveFor()).element("destroy");
 		}
 
 		/**
@@ -267,7 +267,7 @@
 		return uix.make(this, Element, options, ...params);
 	}
 
-	//所有方法
+	//所有方法。方法若返回uix实则，则可链式调用
 	uix.fn.element.methods = {
 		options: t => t.jq().asComp().getOptions(),//获取配置项
 		compType: t => t.jq().asComp().getCompType(),//获取组件类型

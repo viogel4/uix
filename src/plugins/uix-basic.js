@@ -225,34 +225,83 @@
 		});
 	};
 
+	//关闭窗口并销毁
+	function closeAndDestroy(uixInst) {
+		uixInst.window("close", d => {
+			uixInst.window("destroy");
+		}, true);
+	}
+
 	//弹出一个极简面板显示信息
-	uix.info = function (message, timeout = 1200) {
-		let $dom = $("<div class='dpn messager'>").html(message).appendTo(document.body);
-
-		$dom.panel({
-			cssClass: "fcc"
-		});
-
-		let w = $dom.outerWidth();
-		let h = $dom.outerHeight();
-
-		$dom.addClass("opa-0").removeClass("dpn").css({
-			left: "calc(50% - " + (w / 2) + "px)",
-			top: "calc(50% - " + (h / 2) + "px)"
-		}).animate({
-			opacity: 1
-		}, 200, "swing");
+	uix.info = function (message, timeout = 1000, win = window) {
+		let $dom = $("<div class='uix-info'><header class='header'></header></div>").appendTo(win.document.body);
+		let uixInst = uix.dialog($dom, { modal: false }, null, null, message, []);
+		uixInst.window("open");
 
 		setTimeout(() => {
-			$dom.animate({ opacity: 0 }, 200, "swing", () => {
-				$dom.panel("destroy");
-			});
-
+			$dom.animate({ opacity: 0 }, 200, "swing", () => closeAndDestroy(uixInst));
 		}, timeout);
 	};
 
+	//创建对话框
+	function makeDialog($dom, title, message, timeout, buttons, funs) {
+		//点击对话框关闭按钮时，事件重写
+		let opts = {
+			title,
+			onClose: function () {
+				this.destroy();//this是uix组件实例
+			}
+		}
+
+		let uixInst = uix.dialog($dom, opts, 350, 180, message, buttons, funs);
+		uixInst.window("open");
+
+		//延时关闭
+		if (uix.isNumber(timeout) && timeout > 0) {
+			setTimeout(() => {
+				$dom.animate({ opacity: 0 }, 200, "swing", () => closeAndDestroy(uixInst));
+			}, timeout);
+		}
+	}
+
+	//通用弹出alert窗口。timeout表示指定时间之后，自动关闭
+	uix.alert = function (title, message, callback, timeout, win = window) {
+		let $dom = $("<div class='uix-alert'></div>").appendTo(win.document.body);
+
+		//点击确定按钮时的回调函数
+		let fn = function (dom, btn) {
+			let me = this;
+			if (uix.isFunc(callback)) {
+				callback.call(me, dom, btn);
+			}
+			closeAndDestroy(me);
+		};
+
+		makeDialog($dom, title, message, timeout, ["确定"], [fn]);
+	};
+
+	//确认对话框，两个按钮，确认和关闭
+	uix.confirm = function (title, message, callback, timeout, win = window) {
+		let $dom = $("<div class='uix-confirm'></div>").appendTo(win.document.body);
+
+		//点击确定按钮时的回调函数
+		let fn = b => {
+			return function (dom, btn) {
+				let me = this;
+				if (uix.isFunc(callback)) {
+					callback.call(me, b, dom, btn);
+				}
+				closeAndDestroy(me);
+			};
+		};
+
+		makeDialog($dom, title, message, timeout, ["确定", "取消"], [fn(true), fn(false)]);
+	}
+
+
+	//todo
 	//输入对话框
-	uix.prompt = function (title, message, callback, timeout) {
+	uix.prompt = function (title, message, callback, timeout, win = window) {
 		let opts = {};
 		if ($.isPlainObject(title)) {
 			opts = title;
@@ -298,87 +347,9 @@
 		uix.alert(aopts);
 	};
 
-	//确认对话框，两个按钮，确认和关闭
-	uix.confirm = function (title, message, callback, timeout) {
-		let opts = {};
-		if ($.isPlainObject(title)) {
-			opts = title;
-		} else {
-			opts = {
-				title,
-				message,
-				callback,
-				timeout,
-				okText: "确定",
-				cancelText: "取消",
-			};
-		}
-
-		let aopts = $.extend(true, {
-			buttons: [{
-				//确定按钮占位，继承alert组件中的配置
-			}, {
-				buttonText: opts.cancelText || "取消",
-				onClick: function (e) {
-					let dialog = uix.closestWindow(e.currentTarget);
-					dialog.close().destroy();
-				}
-			}]
-		}, opts);
-
-		uix.alert(aopts);
-	}
-
-	//通用弹出alert窗口。timeout表示指定时间之后，自动关闭
-	//当title为对象的时候，title即dialog组件的配置项
-	uix.alert = function (title, message, callback, timeout) {
-		let opts = {};
-		if (uix.isObject(title)) {
-			opts = title;
-		} else {
-			opts = {
-				title,
-				message,
-				callback,
-				timeout,
-				okText: "确定"
-			};
-		}
-
-		let $dom = $("<div class='dpn messager'>").html("<div>" + opts.message + "</div>").appendTo(document.body);
-
-		//对话框配置项
-		let dopts = uix.options({
-			modal: true,//模态窗口
-			buttons: [{
-				buttonText: opts.okText || "确定",
-				onClick: function (e) {//回调函数
-					if (uix.isFunc(opts.callback)) {
-						let b = opts.callback.call(this, e);
-						if (b !== false) {
-							$dom.dialog("close").then("destroy");
-						}
-					} else {
-						$dom.dialog("close").then("destroy");
-					}
-				}
-			}],
-			closeHandler: function (win, e) {//重写配置属性，关闭时同时销毁
-				win.close().destroy();
-			}
-		}, opts);
 
 
-		$dom.dialog(dopts).dialog("center").then("open");
-
-		//超时自动退出
-		if (opts.timeout > 0) {
-			setTimeout(() => {
-				$dom.dialog("close").then("destroy");
-			}, opts.timeout);
-		}
-	};
-
+	//todo
 	//弹出一个通用窗口，用于显示数据，可用于显示iframe
 	//content可以是dom(iframe)，jquery对象或者是文本字符串内容，通常是iframe。
 	uix.open = function (title, content, width, height, okHandler, cancelHandler) {
@@ -456,10 +427,8 @@
 
 	};
 
-
-
-
-	//uixInst可以是uix实例，jquery实例，dom，选择器等
+	//uixInst可以是uix实例，jquery实例，dom，选择器等。
+	//content可以是字符串，也可以是dom，jquery对象
 	uix.window = function (uixInst, title, width, height, content) {
 		uixInst = uix(uixInst);//转换成uix实例
 		let opts;
@@ -474,58 +443,63 @@
 			if ($(dom).children(".header").length === 0) {//无标题栏
 				let $header = $("<header>").addClass("header uix-window");//标题栏
 				$header.append($("<div><i class='ico ico-20 iconify-window'></i></div>").addClass("start"));
-				$header.append($("<div>").addClass("center").html(title || ""));
-
-				//最小化
-				let $ico1 = $("<i class='ico ico-20 iconify-window-min csr-p'></i>").click(function () {
-					let me = this;
-					let state = $(dom).asComp().getState();
-					if (state.minimized) {//已经最小化，则恢复
-						uix(dom).window("restore", (t, d) => {//t是组件，d是组件dom
-							$(me).removeClass("iconify-window-restore").addClass("iconify-window-min");
-						});
-					} else {
-						uix(dom).window("minimize", (t, d) => {//t是组件，d是组件dom
-							//已经存在的恢复按钮变成最大化
-							$header.find(".end>.iconify-window-restore").removeClass("iconify-window-restore").addClass("iconify-window-max");
-							$(me).removeClass("iconify-window-min").addClass("iconify-window-restore");
-						}, {
-							width: 100,
-							height: 50,
-							top: 600,
-							left: 100
-						});
-					}
-				});
-
-				//最大化
-				let $ico2 = $("<i class='ico ico-20 iconify-window-max csr-p'></i>").click(function () {
-					let me = this;
-					let state = $(dom).asComp().getState();
-					if (state.maximized) {//已经最大化，则恢复
-						uix(dom).window("restore", (t, d) => {//t是组件，d是组件dom
-							$(me).removeClass("iconify-window-restore").addClass("iconify-window-max");
-						});
-					} else {
-						uix(dom).window("maximize", (t, d) => {//t是组件，d是组件dom
-							//已经存在的恢复按钮变成最小化
-							$header.find(".end>.iconify-window-restore").removeClass("iconify-window-restore").addClass("iconify-window-min");
-							$(me).removeClass("iconify-window-max").addClass("iconify-window-restore");
-						});
-					}
-				});
-
-				//窗口关闭按钮
-				let $ico3 = $("<i class='ico ico-20 iconify-window-close csr-p'></i>").click(function () {
-					uix(dom).window("close");
-				});
-
+				$header.append($("<div>").addClass("center").html(opts.title || ""));
 
 				//工具按钮
 				let $end = $("<div>").addClass("end event-off");
-				$end.append($ico1);
-				$end.append($ico2);
-				$end.append($ico3);
+
+				if (opts.minimizable !== false) {//支持最小化
+					//最小化
+					let $ico1 = $("<i class='ico ico-20 iconify-window-min csr-p'></i>").click(function () {
+						let me = this;
+						let state = $(dom).asComp().getState();
+						if (state.minimized) {//已经最小化，则恢复
+							uix(dom).window("restore", (t, d) => {//t是组件，d是组件dom
+								$(me).removeClass("iconify-window-restore").addClass("iconify-window-min");
+							});
+						} else {
+							uix(dom).window("minimize", (t, d) => {//t是组件，d是组件dom
+								//已经存在的恢复按钮变成最大化
+								$header.find(".end>.iconify-window-restore").removeClass("iconify-window-restore").addClass("iconify-window-max");
+								$(me).removeClass("iconify-window-min").addClass("iconify-window-restore");
+							}, {
+								width: 100,
+								height: 50,
+								top: 600,
+								left: 100
+							});
+						}
+					});
+					$end.append($ico1);
+				}
+
+				if (opts.maximizable !== false) {//支持最大化
+					//最大化
+					let $ico2 = $("<i class='ico ico-20 iconify-window-max csr-p'></i>").click(function () {
+						let me = this;
+						let state = $(dom).asComp().getState();
+						if (state.maximized) {//已经最大化，则恢复
+							uix(dom).window("restore", (t, d) => {//t是组件，d是组件dom
+								$(me).removeClass("iconify-window-restore").addClass("iconify-window-max");
+							});
+						} else {
+							uix(dom).window("maximize", (t, d) => {//t是组件，d是组件dom
+								//已经存在的恢复按钮变成最小化
+								$header.find(".end>.iconify-window-restore").removeClass("iconify-window-restore").addClass("iconify-window-min");
+								$(me).removeClass("iconify-window-max").addClass("iconify-window-restore");
+							});
+						}
+					});
+					$end.append($ico2);
+				}
+
+				if (opts.closable !== false) {//支持窗口关闭
+					//窗口关闭按钮
+					let $ico3 = $("<i class='ico ico-20 iconify-window-close csr-p'></i>").click(function () {
+						uix(dom).window("close");
+					});
+					$end.append($ico3);
+				}
 
 				$header.append($end);
 				$(dom).prepend($header);
@@ -533,37 +507,65 @@
 
 			//如果指定了窗口内容
 			if (uix.isValid(content)) {
-				let $body = $("<div>").addClass("body uix-window");
+				let exist = true;
+				let $body = $(dom).children(".body.uix-window");
+				if ($body.length === 0) {
+					$body = $("<div>").addClass("body uix-window");
+					exist = false;
+				}
+
 				if (uix.isString(content)) {
 					$body.html(content);
 				} else {
-					$body.append($(content));
+					$body.empty().append($(content));
 				}
-				$(dom).append($body);
+
+				if (exist === false) {
+					$(dom).append($body);
+				}
 			}
 		});
 		return uixInst.window(opts);
 	};
 
-
-
-	//todo:对话框，默认不允许改变尺寸。支持状态栏按钮
+	//对话框，默认不允许改变尺寸。支持状态栏按钮
 	//buttons是状态栏的多个按钮，funs对应状态栏的多个按钮的事件处理
-	uix.dialog = function (uixInst, title, width, height, content, buttons, funs) {
-		uix.window(uixInst, title, width, height, content);
+	uix.dialog = function (uixInst, title, width, height, content, buttons = ["确定", "取消"], funs = [t => uix(t).window("close"), t => uix(t).window("close"),]) {
+		let opts;
+		if (uix.isObject(title)) {
+			opts = $.extend(true, {
+				minimizable: false,
+				maximizable: false,
+				modal: true,
+			}, title, { width, height });
+		} else {
+			opts = { title, width, height, minimizable: false, maximizable: false, modal: true };
+		}
+
+		uixInst = uix.window(uixInst, opts, width, height, content);
+		uixInst.window("center");
+
 		uixInst.forEach(dom => {
 			if ($(dom).children(".footer").length === 0) {//如果没有状态栏
 				if (uix.isArray(buttons) && buttons.length > 0) {//有按钮
 					let $footer = $("<footer>").addClass("footer uix-window");//标题栏
+					//遍历所有按钮
+					buttons.forEach((b, idx) => {
+						let $btn = $("<a>").addClass("btn btn-primary").html(b);
+						$btn.click(function (e) {
+							e.preventDefault();
+							if (uix.isFunc(funs[idx])) {
+								funs[idx].call(uix(dom), dom, this);
+							}
+						});
 
-					//todo
-					//循环添加按钮
-
-
+						$footer.append($btn);
+					});
 					$(dom).append($footer);
 				}
 			}
 		});
+		return uixInst;
 	};
 
 	///////////

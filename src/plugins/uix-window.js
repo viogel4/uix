@@ -319,8 +319,12 @@
 			let w = $(dom).outerWidth();
 			let h = $(dom).outerHeight();
 
-			let ww = $(window).width();
-			let wh = $(window).height();
+			//目标dom所在window
+			let win = uix.frameWindow(dom);
+
+			//window的宽度和高度
+			let ww = $(win).width();
+			let wh = $(win).height();
 
 			//目标位置
 			let pos = {
@@ -392,7 +396,6 @@
 				return this;
 			}
 
-
 			if (state.closed === true) {
 				return this;
 			}
@@ -450,7 +453,7 @@
 		return uix.make(this, Window, options, ...params);
 	};
 
-	//所有方法
+	//所有方法。方法若返回uix实则，则可链式调用
 	uix.fn.window.methods = {
 		setDraggable: (t, draggable) => t.forEach(d => $(d).asComp().setDraggable(draggable)),
 		setResizable: (t, resizable) => t.forEach(d => $(d).asComp().setResizable(resizable))

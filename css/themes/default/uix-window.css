@@ -10,11 +10,13 @@
 	height: 40px;
 	display: flex;
 	flex-direction: row;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #ddd;
+	order: 10;
 }
 
 .uix-window.body {
 	flex-grow: 1;
+	order: 20;
 }
 
 .uix-window.header>:is(.start, .center, .end) {
@@ -32,4 +34,34 @@
 
 .uix-window.header>.end {
 	justify-content: flex-end;
+}
+
+/* 状态栏 */
+.uix-window.footer {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	border-top: 1px solid #ddd;
+	padding: 6px;
+	order: 30;
+}
+
+.uix-window.footer>.btn {
+	margin-left: 6px;
+}
+
+
+/* 以下为常用弹出提示框 */
+.uix-info {
+	border: none;
+}
+
+.uix-info>.uix-window.body {
+	padding: 10px 15px;
+	background-color: rgba(0, 0, 0, 0.6);
+	color: #fff;
+}
+
+:is(.uix-alert, .uix-confirm)>.uix-window.body {
+	padding: 10px;
 }

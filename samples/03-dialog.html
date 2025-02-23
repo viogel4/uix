@@ -25,7 +25,14 @@
     <script>
         $(function () {
             $("#btn1").click(() => {
-                uix.window("#a1", "新增", 400, 300, "这是窗口内容").window("setResizable", false).window("open");
+                uix.dialog("#a1", "新增", 350, 200, "这是窗口内容").window("setResizable", false).window("open");
+            });
+
+            $("#btn2").click(() => {
+                //uix.info("确定要删除吗？");
+                uix.confirm("提示", "普通提示消息",(d)=>{
+                    console.log(d);
+                },2000);
             });
         });
     </script>
@@ -33,6 +40,7 @@
 
 <body>
     <a id="btn1" href="#" class="btn btn-primary">打开窗口</a>
+    <a id="btn2" href="#" class="btn btn-primary">打开info窗口</a>
 
 
 
