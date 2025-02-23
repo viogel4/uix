@@ -464,11 +464,11 @@
 		uixInst = uix(uixInst);//转换成uix实例
 		let opts;
 		if (uix.isObject(title)) {
-			opts = title;
+			opts = $.extend(true, {}, title, { width, height });
 		} else {
 			opts = { title, width, height };
 		}
-		opts.cssClass = "dpf";
+		opts.cssClass = "dpf-c";
 
 		uixInst.forEach((dom) => {
 			if ($(dom).children(".header").length === 0) {//无标题栏
@@ -530,6 +530,17 @@
 				$header.append($end);
 				$(dom).prepend($header);
 			}
+
+			//如果指定了窗口内容
+			if (uix.isValid(content)) {
+				let $body = $("<div>").addClass("body uix-window");
+				if (uix.isString(content)) {
+					$body.html(content);
+				} else {
+					$body.append($(content));
+				}
+				$(dom).append($body);
+			}
 		});
 		return uixInst.window(opts);
 	};
@@ -539,9 +550,20 @@
 	//todo:对话框，默认不允许改变尺寸。支持状态栏按钮
 	//buttons是状态栏的多个按钮，funs对应状态栏的多个按钮的事件处理
 	uix.dialog = function (uixInst, title, width, height, content, buttons, funs) {
+		uix.window(uixInst, title, width, height, content);
+		uixInst.forEach(dom => {
+			if ($(dom).children(".footer").length === 0) {//如果没有状态栏
+				if (uix.isArray(buttons) && buttons.length > 0) {//有按钮
+					let $footer = $("<footer>").addClass("footer uix-window");//标题栏
 
-		//todo
-		//默认不允许改变尺寸
+					//todo
+					//循环添加按钮
+
+
+					$(dom).append($footer);
+				}
+			}
+		});
 	};
 
 	///////////
