@@ -65,7 +65,7 @@
 	}
 
 	function doDown(e) {
-		if (!$.fn.draggable.isDragging) {
+		if (!uix.fn.draggable.isDragging) {
 			return false;
 		}
 
@@ -95,7 +95,7 @@
 	}
 
 	function doMove(e) {
-		if (!$.fn.draggable.isDragging) {
+		if (!uix.fn.draggable.isDragging) {
 			return false;
 		}
 
@@ -110,7 +110,7 @@
 	function doUp(e) {
 		let win = e.data.window || window;
 
-		if (!$.fn.draggable.isDragging) {
+		if (!uix.fn.draggable.isDragging) {
 			clearDragging();
 			return false;
 		}
@@ -171,14 +171,14 @@
 	function clearDragging(e) {
 		let win = uix.valueByKey(e, "data.window", window);
 
-		if ($.fn.draggable.timer) {
-			clearTimeout($.fn.draggable.timer);
-			$.fn.draggable.timer = null;
+		if (uix.fn.draggable.timer) {
+			clearTimeout(uix.fn.draggable.timer);
+			uix.fn.draggable.timer = null;
 		}
 
 		$(win.document).off(".draggable");
 
-		$.fn.draggable.isDragging = false;
+		uix.fn.draggable.isDragging = false;
 
 		setTimeout(function () {
 			$("body").css("cursor", "");
@@ -230,7 +230,7 @@
 			handle.off(".draggable").on("mousemove.draggable", {
 				target: this
 			}, function (e) {
-				if ($.fn.draggable.isDragging) {
+				if (uix.fn.draggable.isDragging) {
 					return;
 				}
 				let opts = $.data(e.data.target, "draggable").options;
@@ -305,8 +305,8 @@
 				$(win.document).on("mousemove.draggable", e.data, doMove);
 				$(win.document).on("mouseup.draggable", e.data, doUp);
 
-				$.fn.draggable.timer = setTimeout(function () {
-					$.fn.draggable.isDragging = true;
+				uix.fn.draggable.timer = setTimeout(function () {
+					uix.fn.draggable.isDragging = true;
 					doDown(e);
 				}, opts.delay);
 

@@ -5,16 +5,10 @@ core,basic,element.js,draggable.js,resizable.js,window.js
 
 
 todo:
-07-window.html未测试完，未实现可最大化，最小化，可关闭的窗口。
-
-
-dialog.js未完成
-
-basic.js中的uix.info等等未完成。
-
-
-penetrable.js穿越组件未完成重构，重构成uix调用的形式。
-2025-02-20
+1.basic.js中的uix.dialog() 538行，未完成。应在uix.window的基础上，完成uix.dialog，支持状态栏按钮。
+2.当uix.window和uix.dialog都完成之后，就可以完成uix.info，uix.alert，uix.confim，uix.prompt，uix.open等工具函数了。
+3.penetrable.js穿越组件未完成重构，重构成uix调用的形式。
+2025-02-23
 
 
 
@@ -27,8 +21,12 @@ penetrable.js穿越组件未完成重构，重构成uix调用的形式。
 
 ==========================================================================
 1.根据easyui的组件功能及源码，补充完善uix组件功能。
+2.
+3.
 
 
 ==============================================================================================================
 目标与特点：
 1.
+2.
+3.

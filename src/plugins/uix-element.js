@@ -181,16 +181,18 @@
 		 * 注意：组件禁用状态下，事件不会移除，但会失效。
 		 */
 		on(event, handler) {
-			let fn = handler;//函数
+			let fn = handler;//事件处理函数
+			let dom = $(this.getTarget());
 
 			handler = function (event) {
 				let enabled = this.isEnabled() || true;//每次事件触发时实时检查
-				if (enabled) {
+				//如果添加了类event-off，则不触发事件
+				if (enabled && !$(dom).is(".event-off")) {
 					fn.call(this, event);
 				}
 			};
 
-			$(this.getTarget()).on(event, e => handler.call(this, e));
+			$(dom).on(event, e => handler.call(this, e));
 			return this;
 		}
 
@@ -215,41 +217,42 @@
 		/**
 		 *委托jquery，执行jquery指令 
 		 * */
-		do(command, ...params) {
+		doJquery(command, ...params) {
 			let dom = this.getTarget();
 			return $(dom)[command](...params);
 		}
 
+		//outer为数值或字符串时表示设置尺寸，布尔值时表示是否获取外部尺寸
 		width(outer = false) {
-			if (uix.isNumber(outer)) {
-				this.do("width", outer);
+			if (uix.isNumber(outer) || uix.isString(outer)) {
+				this.doJquery("width", outer);
 				return this;
 			} else {
-				return outer ? this.do("outerWidth") : this.do("width");
+				return outer ? this.doJquery("outerWidth") : this.doJquery("width");
 			}
 		}
 
 		height(outer = false) {
-			if (uix.isNumber(outer)) {
-				this.do("height", outer);
+			if (uix.isNumber(outer) || uix.isString(outer)) {
+				this.doJquery("height", outer);
 				return this;
 			} else {
-				return outer ? this.do("outerHeight") : this.do("height");
+				return outer ? this.doJquery("outerHeight") : this.doJquery("height");
 			}
 		}
 
 		show() {
-			this.do("show");
+			this.doJquery("show");
 			return this;
 		}
 
 		hide() {
-			this.do("hide");
+			this.doJquery("hide");
 			return this;
 		}
 
-		//以jquery对象的方式继续执行其它操作
-		then(...params) {
+		//以uix组件实例的方式继续执行其它操作
+		and(...params) {
 			let type = this.getCompType();
 			return $(this.getTarget())[type](...params);
 		}

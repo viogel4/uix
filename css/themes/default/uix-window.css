@@ -1,4 +1,34 @@
 /* 背景遮罩 */
-.window-mask {
+.uix-window-mask {
 	background-color: rgba(0, 0, 0, .08);
+}
+
+/* 窗口标题栏 */
+.uix-window.header {
+	flex-shrink: 0;
+	width: 100%;
+	height: 40px;
+	display: flex;
+	flex-direction: row;
+	border-bottom: 1px solid #ccc;
+}
+
+.uix-window.header>.start {
+	flex-shrink: 0;
+	display: flex;
+	padding: 0 6px;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.uix-window.header>.center {
+	flex-grow: 1;
+}
+
+.uix-window.header>.end {
+	flex-shrink: 0;
+	display: flex;
+	padding: 0 6px;
+	justify-content: flex-end;
+	align-items: center;
 }

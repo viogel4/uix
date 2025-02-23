@@ -1,7 +1,0 @@
-[data-comp-role~=dropdown-switch]>[data-comp-role~=si] {
-    transition: all 300ms;
-}
-
-[data-comp-role~=dropdown-switch]:not(.closed)>[data-comp-role~=si] {
-    transform: rotateZ(180deg);
-}

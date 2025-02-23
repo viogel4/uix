@@ -131,6 +131,7 @@
 	flex-shrink: 1;
 }
 
+/* flex布局尺寸调整时，不自动收缩 */
 .fsk-0 {
 	flex-shrink: 0;
 }
@@ -236,14 +237,7 @@ ul.no-style {
 	border: var(--uix-default-border);
 }
 
-.border-default+.border-top-collapse {
-	margin-top: -1px;
-}
-
-.border-default+.border-left-collapse {
-	margin-left: -1px;
-}
-
+/* border bottom default */
 .bbd {
 	border-bottom: var(--uix-default-border);
 }
@@ -252,10 +246,12 @@ ul.no-style {
 	border-top: var(--uix-default-border);
 }
 
+/* 无边框 */
 .no-border {
 	border: none;
 }
 
+/* no border left */
 .nbl {
 	border-left: none;
 }

@@ -22,15 +22,19 @@
 	}
 
 	//递归解析，会改变源对象
-	function parseOptionsAll(cssObject) {
-		if (uix.isObject(cssObject) && Object.keys(cssObject) > 0) {
+	function parseOptionsAll(cssObject, classKey = "cssClass", styleKey = "cssStyle") {
+		if (uix.isObject(cssObject) && Object.keys(cssObject).length > 0) {
 			//先解析自身。注意：会改变参数对象
 			parseOptions(cssObject);
 
 			//再递归解析子对象
 			for (let name in cssObject) {
+				if (name === classKey || name === styleKey) {
+					continue;
+				}
+
 				let obj = cssObject[name];
-				if (uix.isObject(obj) && Object.keys(obj) > 0) {
+				if (uix.isObject(obj) && Object.keys(obj).length > 0) {
 					//递归解析
 					parseOptionsAll(obj);
 				}
@@ -111,7 +115,7 @@
 			let domRef = uix.getRef(dom);
 			let state = $.data(domRef, "comp-state");
 			if (state) {
-				return state.comp;
+				return state.comp;//uix组件实例
 			}
 		}
 		return false;
@@ -181,7 +185,7 @@
 		return doc.defaultView || doc.parentWindow;
 	};
 
-	//将jquery对象转换为uix组件，仅对jquery对象中的第一个元素进行处理
+	//将jquery对象转换为uix组件实例，仅对jquery对象中的第一个元素进行处理
 	$.fn.asComp = function () {
 		return uix.compBy(this);
 	};
@@ -212,7 +216,7 @@
 		return $(this).each((_, t) => $(t)[ability](options));
 	};
 
-	//uix组件的链式函数调用，通过uix对象连续调用
+	//uix实例的链式函数调用
 	uix.fn.and = function (...params) {
 		return this.forEach(d => {
 			//获取组件类型
@@ -375,7 +379,7 @@
 		}
 	};
 
-	//弹出一个通用窗口，用于显示数据，常用于显示iframe
+	//弹出一个通用窗口，用于显示数据，可用于显示iframe
 	//content可以是dom(iframe)，jquery对象或者是文本字符串内容，通常是iframe。
 	uix.open = function (title, content, width, height, okHandler, cancelHandler) {
 		let opts = {};
@@ -451,5 +455,92 @@
 		$dom.dialog(dopts).dialog("center").then("open");
 
 	};
+
+
+
+
+	//uixInst可以是uix实例，jquery实例，dom，选择器等
+	uix.window = function (uixInst, title, width, height, content) {
+		uixInst = uix(uixInst);//转换成uix实例
+		let opts;
+		if (uix.isObject(title)) {
+			opts = title;
+		} else {
+			opts = { title, width, height };
+		}
+		opts.cssClass = "dpf";
+
+		uixInst.forEach((dom) => {
+			if ($(dom).children(".header").length === 0) {//无标题栏
+				let $header = $("<header>").addClass("header uix-window");//标题栏
+				$header.append($("<div><i class='ico ico-20 iconify-window'></i></div>").addClass("start"));
+				$header.append($("<div>").addClass("center").html(title || ""));
+
+				//最小化
+				let $ico1 = $("<i class='ico ico-20 iconify-window-min csr-p'></i>").click(function () {
+					let me = this;
+					let state = $(dom).asComp().getState();
+					if (state.minimized) {//已经最小化，则恢复
+						uix(dom).window("restore", (t, d) => {//t是组件，d是组件dom
+							$(me).removeClass("iconify-window-restore").addClass("iconify-window-min");
+						});
+					} else {
+						uix(dom).window("minimize", (t, d) => {//t是组件，d是组件dom
+							//已经存在的恢复按钮变成最大化
+							$header.find(".end>.iconify-window-restore").removeClass("iconify-window-restore").addClass("iconify-window-max");
+							$(me).removeClass("iconify-window-min").addClass("iconify-window-restore");
+						}, {
+							width: 100,
+							height: 50,
+							top: 600,
+							left: 100
+						});
+					}
+				});
+
+				//最大化
+				let $ico2 = $("<i class='ico ico-20 iconify-window-max csr-p'></i>").click(function () {
+					let me = this;
+					let state = $(dom).asComp().getState();
+					if (state.maximized) {//已经最大化，则恢复
+						uix(dom).window("restore", (t, d) => {//t是组件，d是组件dom
+							$(me).removeClass("iconify-window-restore").addClass("iconify-window-max");
+						});
+					} else {
+						uix(dom).window("maximize", (t, d) => {//t是组件，d是组件dom
+							//已经存在的恢复按钮变成最小化
+							$header.find(".end>.iconify-window-restore").removeClass("iconify-window-restore").addClass("iconify-window-min");
+							$(me).removeClass("iconify-window-max").addClass("iconify-window-restore");
+						});
+					}
+				});
+
+				//窗口关闭按钮
+				let $ico3 = $("<i class='ico ico-20 iconify-window-close csr-p'></i>").click(function () {
+					uix(dom).window("close");
+				});
+
+				let $end = $("<div>").addClass("end event-off");
+				$end.append($ico1);
+				$end.append($ico2);
+				$end.append($ico3);
+
+				$header.append($end);
+				$(dom).prepend($header);
+			}
+		});
+		return uixInst.window(opts);
+	};
+
+
+
+	//todo:对话框，默认不允许改变尺寸。支持状态栏按钮
+	//buttons是状态栏的多个按钮，funs对应状态栏的多个按钮的事件处理
+	uix.dialog = function (uixInst, title, width, height, content, buttons, funs) {
+
+		//todo
+		//默认不允许改变尺寸
+	};
+
 	///////////
 })(jQuery);

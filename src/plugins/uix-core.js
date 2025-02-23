@@ -11,6 +11,9 @@
 
 	uix.fn = uix.prototype;//赋值任意一个对象皆可，如：{}，其实uix.prototype就是{}
 	uix.fn.init = function (jq) {
+		if (jq instanceof uix) {//如果参数已经是uix实例，则直接返回
+			return jq;
+		}
 		this.$jq = $(jq);
 		return this;
 	};
