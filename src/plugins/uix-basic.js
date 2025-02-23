@@ -520,6 +520,8 @@
 					uix(dom).window("close");
 				});
 
+
+				//工具按钮
 				let $end = $("<div>").addClass("end event-off");
 				$end.append($ico1);
 				$end.append($ico2);
