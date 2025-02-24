@@ -661,7 +661,7 @@ ul.no-style {
 	margin-left: 0;
 }
 
-/* 配色系统 */
+/* 通用配色系统 */
 .bg-primary {
 	background-color: var(--uix-blue);
 	color: var(--uix-light);
@@ -907,7 +907,7 @@ ul.no-style {
 	color: var(--uix-light);
 }
 
-/* 图标系统 */
+/* 通用图标系统 */
 .ico {
 	display: inline-block;
 	background-repeat: no-repeat;

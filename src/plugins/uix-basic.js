@@ -225,13 +225,7 @@
 		});
 	};
 
-	//关闭窗口并销毁
-	function closeAndDestroy(uixInst) {
-		uixInst.window("close", d => {
-			uixInst.window("destroy");
-		}, true);
-	}
-
+	//收下为常用对话框快捷工具方法
 	//弹出一个极简面板显示信息
 	uix.info = function (message, timeout = 1000, win = window) {
 		let $dom = $("<div class='uix-info'><header class='header'></header></div>").appendTo(win.document.body);
@@ -242,27 +236,6 @@
 			$dom.animate({ opacity: 0 }, 200, "swing", () => closeAndDestroy(uixInst));
 		}, timeout);
 	};
-
-	//创建对话框
-	function makeDialog($dom, title, message, timeout, buttons, funs) {
-		//点击对话框关闭按钮时，事件重写
-		let opts = {
-			title,
-			onClose: function () {
-				this.destroy();//this是uix组件实例
-			}
-		}
-
-		let uixInst = uix.dialog($dom, opts, 350, 180, message, buttons, funs);
-		uixInst.window("open");
-
-		//延时关闭
-		if (uix.isNumber(timeout) && timeout > 0) {
-			setTimeout(() => {
-				$dom.animate({ opacity: 0 }, 200, "swing", () => closeAndDestroy(uixInst));
-			}, timeout);
-		}
-	}
 
 	//通用弹出alert窗口。timeout表示指定时间之后，自动关闭
 	uix.alert = function (title, message, callback, timeout, win = window) {
@@ -299,132 +272,51 @@
 	}
 
 
-	//todo
-	//输入对话框
+	//弹出输入对话框
 	uix.prompt = function (title, message, callback, timeout, win = window) {
-		let opts = {};
-		if ($.isPlainObject(title)) {
-			opts = title;
-		} else {
-			message = "<div class='mb-2'>" + message + "</div><div class='uix-messager-input'></div>";
-			opts = {
-				title,
-				message,
-				callback,
-				timeout,
-				okText: "确定",
-				cancelText: "取消"
-			};
-		}
+		let $dom = $("<div class='uix-prompt'></div>").appendTo(win.document.body);
+		let $content = $("<div>");
+		$content.append($("<div>").html(message));
+		$content.append($("<div><input type='text' placeholder='请输入值'></div>"));
 
-		let aopts = $.extend(true, {
-			buttons: [{
-				//确定按钮占位，继承alert组件中的配置
-			}, {
-				buttonText: opts.cancelText || "取消",
-				onClick: function (e) {
-					let dialog = uix.closestWindow(e.currentTarget);
-					dialog.close().destroy();
-				}
-			}]
-		}, opts, {
-			onBeforeOpen: function () {
-				let $input = this.getBody().find(".uix-messager-input");
-				$input.textbox({
-					width: "100%"
-				});
-			},
-			callback: function (e) {
-				let win = uix.closestWindow(e.currentTarget);
-				let $input = win.getBody().find(".uix-messager-input");
-				let value = $input.asComp().getValue();//表单输入框中的值
-				if ($.isFunction(opts.callback)) {
-					opts.callback.call(win, value);
-				}
-			},
-		});
+		//点击确定按钮时的回调函数
+		let fn1 = function (dom, btn) {
+			let me = this;
+			if (uix.isFunc(callback)) {
+				//获取输入框的值
+				let val = $(dom).find(":input").val();
+				callback.call(me, val, dom, btn);
+			}
+			closeAndDestroy(me);
+		};
 
-		uix.alert(aopts);
+		let fn2 = function () {
+			closeAndDestroy(this);
+		};
+
+		makeDialog($dom, title, $content, timeout, ["确定", "取消"], [fn1, fn2]);
 	};
 
-
-
-	//todo
-	//弹出一个通用窗口，用于显示数据，可用于显示iframe
+	//弹出一个通用窗口，用于显示信息，尤其可用于显示iframe
 	//content可以是dom(iframe)，jquery对象或者是文本字符串内容，通常是iframe。
-	uix.open = function (title, content, width, height, okHandler, cancelHandler) {
-		let opts = {};
+	uix.open = function (title, width, height, content, buttons, funs, win = window) {
+		let $dom = $("<div class='uix-open'></div>").appendTo(win.document.body);
+		//window组件配置项
+		let opts;
 		if (uix.isObject(title)) {
 			opts = title;
 		} else {
-			opts = {
-				title,
-				content,
-				width,
-				height,
-				okText: "确定",
-				cancelText: "取消",
-				okHandler,
-				cancelHandler
-			};
+			opts = { title };
 		}
+		opts.onClose = function () {
+			this.destroy();//this是uix组件实例
+		};
+		opts.modal = false;
+		opts.resizable = false;
 
-		let $dom = $("<div class='dpn'>").appendTo(document.body);
-
-		if (uix.isString(opts.content)) {
-			$dom.html("<div class='fit bsb p-1 ofh'>" + opts.content + "</div>");
-		} else {
-			$dom.empty().append($(opts.content).addClass("fit bsb p-2 ofh"));
-		}
-
-		//如果是iframe内容
-		if ($(opts.content).is("iframe")) {
-			$dom.addClass("uix-iframe-dialog");
-		}
-		opts.content = null;//必须移除，否则会使用此content填充面板内容
-
-		let dopts = uix.options({
-			resizable: true,
-			maximizable: true, //是否可最大化
-			buttons: [{
-				buttonText: opts.okText || "确定",
-				onClick: function (e) {//回调函数
-					if (uix.isFunc(opts.okHandler)) {
-						let b = opts.okHandler.call(this, e);
-						if (b !== false) {
-							$dom.dialog("close").then("destroy");
-						}
-					} else {
-						$dom.dialog("close").then("destroy");
-					}
-				}
-			}, {
-				buttonText: opts.cancelText || "取消",
-				onClick: function (e) {
-					let dialog = uix.closestWindow(e.currentTarget);
-					let handler = dialog.getOptions().closeHandler;
-					if (uix.isFunc(handler)) {
-						handler.call(this, dialog, e);
-					}
-				}
-			}],
-			closeHandler: function (win, e) {
-				if (uix.isFunc(opts.cancelHandler)) {
-					let b = opts.cancelHandler.call(this, e);
-					if (b !== false) {
-						win.close().destroy();
-					}
-				} else {
-					win.close().destroy();
-				}
-			}
-		}, opts, {
-			content: null
-		});
-
-
-		$dom.dialog(dopts).dialog("center").then("open");
-
+		let uixInst = uix.dialog($dom, opts, width, height, content, buttons, funs);
+		uixInst.window("open");
+		return uixInst;
 	};
 
 	//uixInst可以是uix实例，jquery实例，dom，选择器等。
@@ -530,7 +422,7 @@
 
 	//对话框，默认不允许改变尺寸。支持状态栏按钮
 	//buttons是状态栏的多个按钮，funs对应状态栏的多个按钮的事件处理
-	uix.dialog = function (uixInst, title, width, height, content, buttons = ["确定", "取消"], funs = [t => uix(t).window("close"), t => uix(t).window("close"),]) {
+	uix.dialog = function (uixInst, title, width, height, content, buttons = ["确定", "取消"], funs = [t => uix(t).window("close"), t => uix(t).window("close")]) {
 		let opts;
 		if (uix.isObject(title)) {
 			opts = $.extend(true, {
@@ -567,6 +459,36 @@
 		});
 		return uixInst;
 	};
+
+
+	//关闭窗口并销毁
+	function closeAndDestroy(uixInst) {
+		uixInst.window("close", d => {
+			uixInst.window("destroy");
+		}, true);
+	}
+
+	//创建对话框
+	function makeDialog($dom, title, message, timeout, buttons, funs) {
+		//点击对话框关闭按钮时，事件重写
+		let opts = {
+			title,
+			resizable: false,
+			onClose: function () {
+				this.destroy();//this是uix组件实例
+			}
+		}
+
+		let uixInst = uix.dialog($dom, opts, 350, 180, message, buttons, funs);
+		uixInst.window("open");
+
+		//延时关闭
+		if (uix.isNumber(timeout) && timeout > 0) {
+			setTimeout(() => {
+				$dom.animate({ opacity: 0 }, 200, "swing", () => closeAndDestroy(uixInst));
+			}, timeout);
+		}
+	}
 
 	///////////
 })(jQuery);

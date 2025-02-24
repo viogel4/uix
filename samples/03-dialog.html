@@ -30,9 +30,9 @@
 
             $("#btn2").click(() => {
                 //uix.info("确定要删除吗？");
-                uix.confirm("提示", "普通提示消息",(d)=>{
-                    console.log(d);
-                },2000);
+                //uix.alert("提示","这是一个普通消息");
+
+                uix.open("提示", 600, 400, "<iframe src='http://www.163.com'></iframe>");
             });
         });
     </script>

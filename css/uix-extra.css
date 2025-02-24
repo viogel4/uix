@@ -1,3 +1,4 @@
+/* 按钮区 */
 .btn {
     padding: 5px 10px;
     outline: none;
@@ -65,19 +66,12 @@
     border: 1px solid transparent;
 }
 
-/* 表单默认美化样式 */
-.light-form input[type=text],
-.light-form input[type=password],
-.light-form select {
-    border: 1px solid #ccc;
+/* 表单区 */
+input[type=text],
+input[type=password],
+select {
+    outline: none;
     box-sizing: border-box;
-    padding: 7px;
-    width: 240px;
-    color: #333;
-}
-
-button,
-input[type=button] {
+    padding: 8px 5px 8px 6px;
     border: 1px solid #ccc;
-    padding: 5px 15px;
 }
